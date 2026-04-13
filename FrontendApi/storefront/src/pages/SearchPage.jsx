@@ -5,9 +5,11 @@ import { useQuery } from '@tanstack/react-query';
 import { searchProducts } from '../services/search';
 import { fetchProducts, fetchProductBySlug } from '../services/products';
 import ProductCard from '../components/ProductCard';
+import { getCategoryDisplayName } from '../utils/categoryLocale';
 
 export default function SearchPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n?.language || 'fr';
   const [params, setParams] = useSearchParams();
 
   const q = params.get('q') || '';
@@ -52,7 +54,7 @@ export default function SearchPage() {
           try {
             const r = await fetchProductBySlug(slug);
             const cat = r.data.data?.category;
-            return cat ? { id: cat.id, name: cat.name } : null;
+            return cat ? { id: cat.id, name: cat.name, slug: cat.slug } : null;
           } catch {
             return null;
           }
@@ -97,7 +99,7 @@ export default function SearchPage() {
             <option value="">—</option>
             {(catOptions || []).map((c) => (
               <option key={c.id} value={c.id}>
-                {c.name}
+                {getCategoryDisplayName(c, lang)}
               </option>
             ))}
           </select>

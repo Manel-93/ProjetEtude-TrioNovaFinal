@@ -96,6 +96,14 @@ app.use('/api/payments/webhook', express.raw({ type: 'application/json' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Évite cache navigateur / proxy sur l’API (catalogue à jour)
+app.use('/api', (req, res, next) => {
+  if (String(req.path || '').includes('webhook')) return next();
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  next();
+});
+
 // Health check
 app.get('/health', (req, res) => {
   res.json({

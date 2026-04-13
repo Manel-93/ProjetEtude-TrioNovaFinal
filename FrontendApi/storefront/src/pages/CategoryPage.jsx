@@ -5,10 +5,12 @@ import { fetchProducts, fetchProductBySlug, fetchCategories } from '../services/
 import { getDefaultMedicalImageUrl, placeholderUrl } from '../utils/catalogFallbackImages';
 import { getCategoryCoverImageUrl } from '../utils/categoryImage';
 import ProductCard from '../components/ProductCard';
+import { getCategoryDisplayName, getCategoryDisplayDescription } from '../utils/categoryLocale';
 
 export default function CategoryPage() {
   const { categoryId } = useParams();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n?.language || 'fr';
   const id = parseInt(categoryId, 10);
 
   const { data: meta } = useQuery({
@@ -39,6 +41,8 @@ export default function CategoryPage() {
 
   const products = list?.data || [];
   const cat = meta?.category;
+  const catTitle = cat ? getCategoryDisplayName(cat, lang) : '';
+  const catDesc = cat ? getCategoryDisplayDescription(cat, lang) : '';
   const cover = getCategoryCoverImageUrl(cat, meta?.sample);
   const coverFallback = getDefaultMedicalImageUrl();
   const coverFinal = placeholderUrl('Medical Category', 1200, 675);
@@ -53,7 +57,7 @@ export default function CategoryPage() {
         <div className="aspect-[16/9] w-full bg-slate-100 sm:max-w-md md:aspect-auto md:min-h-[220px]">
           <img
             src={cover || coverFallback}
-            alt={cat?.name || 'Catégorie médicale'}
+            alt={catTitle || t('common.categoryFallback')}
             className="h-full w-full object-cover"
             onError={(e) => {
               const next = e.currentTarget.src.includes('source.unsplash.com')
@@ -67,8 +71,8 @@ export default function CategoryPage() {
         </div>
         <div className="p-6">
           <p className="text-xs font-medium uppercase tracking-wide text-ocean">{t('category.title')}</p>
-          <h1 className="mt-1 text-2xl font-bold text-slate-900">{cat?.name || '—'}</h1>
-          {cat?.description ? <p className="mt-3 text-slate-600">{cat.description}</p> : null}
+          <h1 className="mt-1 text-2xl font-bold text-slate-900">{catTitle || '—'}</h1>
+          {catDesc ? <p className="mt-3 text-slate-600">{catDesc}</p> : null}
           <Link to="/" className="mt-4 inline-block text-sm font-medium text-ocean hover:underline">
             ← {t('nav.home')}
           </Link>

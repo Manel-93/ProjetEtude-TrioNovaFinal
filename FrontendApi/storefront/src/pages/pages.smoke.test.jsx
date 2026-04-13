@@ -22,6 +22,7 @@ import AccountOrdersPage from './AccountOrdersPage';
 import AccountOrderDetailPage from './AccountOrderDetailPage';
 import AccountLayout from './AccountLayout';
 import AccountAddressesPage from './AccountAddressesPage';
+import UnitTestsPage from './UnitTestsPage';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -214,7 +215,8 @@ const pages = [
   ['AccountOrdersPage', AccountOrdersPage],
   ['AccountOrderDetailPage', AccountOrderDetailPage],
   ['AccountLayout', AccountLayout],
-  ['AccountAddressesPage', AccountAddressesPage]
+  ['AccountAddressesPage', AccountAddressesPage],
+  ['UnitTestsPage', UnitTestsPage]
 ];
 
 describe('Pages smoke tests', () => {

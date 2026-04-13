@@ -4,9 +4,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getCart, removeFromCart, updateCartItem } from '../services/cart';
 import { getApiError } from '../utils/errors';
 import { isInStock, getPrimaryImageUrl } from '../utils/product';
+import { getProductDisplayName } from '../utils/productLocale';
 
 export default function CartPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const qc = useQueryClient();
 
   const { data, isLoading, error } = useQuery({
@@ -48,7 +49,8 @@ export default function CartPage() {
         <>
           {unavailable.length > 0 ? (
             <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-              {t('cart.stockIssue')} : {unavailable.map((i) => i.product?.name).join(', ')}
+              {t('cart.stockIssue')} :{' '}
+              {unavailable.map((i) => getProductDisplayName(i.product, i18n?.language || 'fr')).join(', ')}
             </div>
           ) : null}
 
@@ -57,6 +59,7 @@ export default function CartPage() {
               const p = line.product;
               const ok = isInStock(p);
               const img = getPrimaryImageUrl({ ...p, images: p.images || [] });
+              const lineTitle = getProductDisplayName(p, i18n?.language || 'fr');
               return (
                 <li key={line.id} className="card flex flex-col gap-4 p-4 sm:flex-row sm:items-center">
                   <div className="h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-slate-100">
@@ -68,7 +71,7 @@ export default function CartPage() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <Link to={`/produit/${p.slug}`} className="font-semibold text-slate-900 hover:text-ocean">
-                      {p.name}
+                      {lineTitle}
                     </Link>
                     <p className="text-sm text-slate-600">
                       {t('product.price', { value: Number(p.priceTtc).toFixed(2) })}

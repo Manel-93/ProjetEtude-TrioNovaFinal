@@ -19,7 +19,8 @@
     "legal": "Mentions légales",
     "contact": "Contact",
     "social": "Réseaux sociaux",
-    "rights": "© {{year}} AltheaSystems"
+    "rights": "© {{year}} AltheaSystems",
+    "compliance": "AltheaSystems - commerce électronique. Données traitées conformément à la réglementation applicable."
   },
   "home": {
     "carousel": "À la une",
@@ -114,6 +115,28 @@
     "save": "Enregistrer",
     "phone": "Téléphone"
   },
+  "accountPayments": {
+    "subtitle": "Cartes enregistrées via Stripe (identifiants fournis par l'API lors d'un paiement enregistré).",
+    "cardFallback": "Carte",
+    "setDefault": "Définir par défaut",
+    "delete": "Supprimer",
+    "defaultBadge": "Par défaut",
+    "maskedDigits": "•••• ••••",
+    "expires": "Exp. {{value}}",
+    "fetchError": "Impossible de charger vos moyens de paiement.",
+    "emptyTitle": "Aucun moyen de paiement enregistré.",
+    "emptyDescription": "Vos futures cartes apparaîtront ici après votre premier paiement validé.",
+    "emptyHint": "Astuce : finalisez une commande par carte pour l'enregistrer automatiquement sur votre compte."
+  },
+  "testsUnit": {
+    "title": "Tests unitaires",
+    "subtitle": "Cette page récapitule les tests unitaires implémentés dans le storefront et ce qu'ils vérifient.",
+    "fileLabel": "Fichier de test",
+    "smokePages": {
+      "title": "Smoke tests des pages",
+      "description": "Rend chaque page principale de manière isolée pour valider qu'aucun crash ne survient au montage."
+    }
+  },
   "orders": {
     "title": "Commandes",
     "number": "Commande",
@@ -144,6 +167,8 @@
     "retry": "Réessayer",
     "back": "Retour",
     "continue": "Continuer",
-    "lang": "Langue"
+    "lang": "Langue",
+    "productFallback": "Produit médical",
+    "categoryFallback": "Catégorie médicale"
   }
 }

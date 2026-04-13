@@ -284,6 +284,10 @@ export class StripeService {
           payment = await this.paymentRepository.updateStatus(paymentIntentId, newStatus, metadata);
         }
 
+        if (event.type === 'payment_intent.succeeded' && payment?.userId) {
+          await this.saveUserPaymentMethodFromIntent(payment, event.data.object);
+        }
+
         // Créer la commande après mise à jour du statut du paiement
         if (shouldCreateOrder && payment) {
           console.log('🔵 [STRIPE SERVICE] shouldCreateOrder is TRUE, payment exists:', {
@@ -316,9 +320,6 @@ export class StripeService {
             });
             
             console.log('✅ [STRIPE SERVICE] Order created successfully:', order.orderNumber);
-
-            // Sauvegarder la méthode de paiement Stripe pour l'utilisateur
-            await this.saveUserPaymentMethodFromIntent(payment, event.data.object);
 
             // Email de confirmation de commande (best-effort)
             await this.sendOrderConfirmationEmail(order, payment.userId);
@@ -370,20 +371,32 @@ export class StripeService {
     if (!payment?.userId) return;
 
     try {
-      const paymentIntent = await this.stripe.paymentIntents.retrieve(paymentIntentEventObject.id, {
-        expand: ['latest_charge']
+      const piId = paymentIntentEventObject?.id;
+      if (!piId) return;
+
+      const paymentIntent = await this.stripe.paymentIntents.retrieve(piId, {
+        expand: ['latest_charge.payment_method', 'payment_method']
       });
 
-      const latestCharge = paymentIntent?.latest_charge;
-      const paymentMethodId =
-        paymentIntent?.payment_method ||
-        latestCharge?.payment_method ||
-        null;
+      const pmRef = paymentIntent.payment_method || paymentIntent?.latest_charge?.payment_method;
+      const paymentMethodId = typeof pmRef === 'string' ? pmRef : pmRef?.id || null;
+
+      const latestCharge =
+        typeof paymentIntent.latest_charge === 'object' ? paymentIntent.latest_charge : null;
+
       const customerId =
-        paymentIntent?.customer ||
-        latestCharge?.customer ||
+        (typeof paymentIntent.customer === 'string'
+          ? paymentIntent.customer
+          : paymentIntent.customer?.id) ||
+        (typeof latestCharge?.customer === 'string'
+          ? latestCharge.customer
+          : latestCharge?.customer?.id) ||
         null;
-      const card = latestCharge?.payment_method_details?.card || null;
+
+      const card =
+        (typeof pmRef === 'object' && pmRef?.card) ||
+        latestCharge?.payment_method_details?.card ||
+        null;
 
       if (!paymentMethodId) return;
 

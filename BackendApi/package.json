@@ -8,6 +8,7 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "update:medical-images": "node scripts/updateMedicalProductImages.js",
+    "remove:tensiometre-bras": "node scripts/deleteTensiometreBrasProduct.js",
     "update:category-images": "node scripts/updateCategoryImages.js"
   },
   "keywords": [

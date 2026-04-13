@@ -8,10 +8,12 @@ import { getApiError } from '../utils/errors';
 import { isInStock, buildProductGalleryImages, getPrimaryImageUrl } from '../utils/product';
 import ProductCard from '../components/ProductCard';
 import { resolveMediaUrl } from '../utils/mediaUrl';
+import { getProductDisplayName } from '../utils/productLocale';
+import { getCategoryDisplayName } from '../utils/categoryLocale';
 
 export default function ProductPage() {
   const { slug } = useParams();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const qc = useQueryClient();
   const [imgIdx, setImgIdx] = useState(0);
   const [msg, setMsg] = useState('');
@@ -61,6 +63,7 @@ export default function ProductPage() {
   const mainUrl = main?.url ? resolveMediaUrl(main.url) : getPrimaryImageUrl(data);
   const stockOk = isInStock(data);
   const specs = data.technicalSpecs && typeof data.technicalSpecs === 'object' ? data.technicalSpecs : null;
+  const displayName = getProductDisplayName(data, i18n?.language || 'fr');
 
   return (
     <div className="mx-auto max-w-6xl space-y-10">
@@ -92,7 +95,7 @@ export default function ProductPage() {
         </div>
 
         <div>
-          <h1 className="text-2xl font-bold text-ink md:text-3xl">{data.name}</h1>
+          <h1 className="text-2xl font-bold text-ink md:text-3xl">{displayName}</h1>
           <p className="mt-4 text-3xl font-bold text-ocean">
             {t('product.price', { value: Number(data.priceTtc).toFixed(2) })}
           </p>
@@ -104,7 +107,7 @@ export default function ProductPage() {
               to={`/catalogue/${data.category.id}`}
               className="mt-2 inline-block text-sm text-ocean hover:underline"
             >
-              {data.category.name}
+              {getCategoryDisplayName(data.category, i18n?.language || 'fr')}
             </Link>
           ) : null}
 

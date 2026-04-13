@@ -12,10 +12,10 @@ export function getPrimaryImage(product) {
 }
 
 export function getPrimaryImageUrl(product) {
-  const direct = getMedicalProductDirectImageUrl(product);
-  if (direct) return direct;
   const img = getPrimaryImage(product);
   if (img?.url) return resolveMediaUrl(img.url);
+  const direct = getMedicalProductDirectImageUrl(product);
+  if (direct) return direct;
   return getCatalogFallbackProductImage(product);
 }
 
@@ -24,15 +24,11 @@ export function getPrimaryImageUrl(product) {
  * @param {{ name?: string, slug?: string, images?: Array<{ id?: string, url?: string, order?: number, isPrimary?: boolean }> }} product
  */
 export function buildProductGalleryImages(product) {
-  const direct = getMedicalProductDirectImageUrl(product);
   const sorted = [...(product.images || [])].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-  if (sorted.length === 0) {
-    return direct
-      ? [{ id: 'direct-medical', url: direct, order: 0, isPrimary: true }]
-      : [];
-  }
-  if (!direct) return sorted;
-  return sorted.map((im, i) => (i === 0 ? { ...im, url: direct } : im));
+  if (sorted.length > 0) return sorted;
+  const direct = getMedicalProductDirectImageUrl(product);
+  if (direct) return [{ id: 'direct-medical', url: direct, order: 0, isPrimary: true }];
+  return [];
 }
 
 export function isInStock(product) {

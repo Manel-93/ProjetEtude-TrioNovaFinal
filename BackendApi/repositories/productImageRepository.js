@@ -14,6 +14,21 @@ export class ProductImageRepository {
     return images;
   }
 
+  /** Images pour plusieurs productId (une requête MongoDB). */
+  async findByProductIds(productIds) {
+    const ids = [
+      ...new Set(
+        (productIds || [])
+          .map((id) => Number(id))
+          .filter((n) => Number.isFinite(n))
+      )
+    ];
+    if (ids.length === 0) return [];
+    return ProductImage.find({ productId: { $in: ids } })
+      .sort({ productId: 1, order: 1, createdAt: 1 })
+      .lean();
+  }
+
   async findById(id) {
     const image = await ProductImage.findById(id).lean();
     return image || null;

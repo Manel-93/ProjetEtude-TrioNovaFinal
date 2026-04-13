@@ -19,7 +19,8 @@
     "legal": "إشعار قانوني",
     "contact": "اتصل بنا",
     "social": "الشبكات الاجتماعية",
-    "rights": "© {{year}} AltheaSystems"
+    "rights": "© {{year}} AltheaSystems",
+    "compliance": "AltheaSystems - تجارة إلكترونية. تتم معالجة البيانات وفق القوانين المعمول بها."
   },
   "home": {
     "carousel": "مختارات",
@@ -114,6 +115,28 @@
     "save": "حفظ",
     "phone": "الهاتف"
   },
+  "accountPayments": {
+    "subtitle": "البطاقات المحفوظة عبر Stripe (معرّفات ترجعها الواجهة البرمجية بعد الدفع).",
+    "cardFallback": "بطاقة",
+    "setDefault": "تعيين كافتراضي",
+    "delete": "حذف",
+    "defaultBadge": "افتراضي",
+    "maskedDigits": "•••• ••••",
+    "expires": "انتهاء {{value}}",
+    "fetchError": "تعذّر تحميل وسائل الدفع.",
+    "emptyTitle": "لا توجد وسيلة دفع محفوظة بعد.",
+    "emptyDescription": "ستظهر بطاقاتك هنا بعد أول عملية دفع ناجحة.",
+    "emptyHint": "نصيحة: أكمل عملية شراء بالدفع بالبطاقة ليتم حفظها تلقائيا في حسابك."
+  },
+  "testsUnit": {
+    "title": "اختبارات الوحدة",
+    "subtitle": "تلخص هذه الصفحة اختبارات الوحدة المنفذة في واجهة المتجر وما الذي تتحقق منه.",
+    "fileLabel": "ملف الاختبار",
+    "smokePages": {
+      "title": "اختبارات smoke للصفحات",
+      "description": "تقوم بعرض كل صفحة رئيسية بشكل معزول للتأكد من عدم حدوث تعطل عند التحميل."
+    }
+  },
   "orders": {
     "title": "الطلبات",
     "number": "الطلب",
@@ -144,6 +167,8 @@
     "retry": "إعادة المحاولة",
     "back": "رجوع",
     "continue": "متابعة",
-    "lang": "اللغة"
+    "lang": "اللغة",
+    "productFallback": "منتج طبي",
+    "categoryFallback": "فئة طبية"
   }
 }

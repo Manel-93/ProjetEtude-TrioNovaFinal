@@ -241,8 +241,10 @@ export default function CheckoutPage() {
             }}
           >
             <PaymentForm
-              onSuccess={() => {
+              onSuccess={async () => {
                 qc.invalidateQueries({ queryKey: ['cart'] });
+                qc.invalidateQueries({ queryKey: ['payment-methods'] });
+                await refreshProfile?.();
                 navigate('/caisse/succes');
               }}
             />

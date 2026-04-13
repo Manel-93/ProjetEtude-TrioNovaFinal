@@ -19,7 +19,8 @@
     "legal": "Legal notice",
     "contact": "Contact",
     "social": "Social networks",
-    "rights": "© {{year}} AltheaSystems"
+    "rights": "© {{year}} AltheaSystems",
+    "compliance": "AltheaSystems - e-commerce. Data is processed according to applicable regulations."
   },
   "home": {
     "carousel": "Highlights",
@@ -114,6 +115,28 @@
     "save": "Save",
     "phone": "Phone"
   },
+  "accountPayments": {
+    "subtitle": "Cards saved through Stripe (identifiers returned by the API after a saved payment).",
+    "cardFallback": "Card",
+    "setDefault": "Set as default",
+    "delete": "Delete",
+    "defaultBadge": "Default",
+    "maskedDigits": "•••• ••••",
+    "expires": "Exp. {{value}}",
+    "fetchError": "Could not load your payment methods.",
+    "emptyTitle": "No payment method saved yet.",
+    "emptyDescription": "Your future cards will appear here after your first successful payment.",
+    "emptyHint": "Tip: complete a checkout with card payment to automatically register it on your account."
+  },
+  "testsUnit": {
+    "title": "Unit tests",
+    "subtitle": "This page summarizes the unit tests implemented in the storefront and what they validate.",
+    "fileLabel": "Test file",
+    "smokePages": {
+      "title": "Page smoke tests",
+      "description": "Renders every main page in isolation to ensure no crash occurs at mount."
+    }
+  },
   "orders": {
     "title": "Orders",
     "number": "Order",
@@ -144,6 +167,8 @@
     "retry": "Retry",
     "back": "Back",
     "continue": "Continue",
-    "lang": "Language"
+    "lang": "Language",
+    "productFallback": "Medical product",
+    "categoryFallback": "Medical category"
   }
 }

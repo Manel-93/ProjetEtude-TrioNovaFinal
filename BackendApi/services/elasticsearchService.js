@@ -254,6 +254,32 @@ export class ElasticsearchService {
         };
       });
 
+      // Toujours prendre les images depuis MongoDB : l’index ES peut être obsolète
+      // (catalogue / recherche sans images alors que ProductImage est à jour).
+      const productIds = [...new Set(products.map((p) => p.id).filter((id) => id != null))];
+      if (productIds.length > 0) {
+        const allImages = await this.productImageRepository.findByProductIds(productIds);
+        const byProductId = new Map();
+        for (const img of allImages) {
+          const pid = Number(img.productId);
+          if (!byProductId.has(pid)) byProductId.set(pid, []);
+          byProductId.get(pid).push({
+            url: img.url,
+            alt: img.alt || '',
+            isPrimary: Boolean(img.isPrimary),
+            order: img.order ?? 0
+          });
+        }
+        for (const p of products) {
+          const pid = Number(p.id);
+          if (byProductId.has(pid)) {
+            p.images = byProductId.get(pid);
+          } else if (!Array.isArray(p.images)) {
+            p.images = [];
+          }
+        }
+      }
+
       return {
         data: products,
         pagination: {

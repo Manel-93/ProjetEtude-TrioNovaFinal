@@ -40,9 +40,9 @@ function norm(s) {
 /** URLs fixes demandées (alignées avec le script MongoDB `update:medical-images`). */
 export const MEDICAL_PRODUCT_DIRECT_IMAGE_URLS = {
   thermometreInfrarouge:
-    'https://images.unsplash.com/photo-1585590586287-93df0912b26a?q=80&w=1171&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'https://images.unsplash.com/photo-1585417239725-00feea715e12?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   tensiometreElectrique:
-    'https://plus.unsplash.com/premium_photo-1683141457896-367f0ad2ddcd?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'https://images.unsplash.com/photo-1747224317356-6dd1a4a078fd?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   stethoscopeMedical:
     'https://images.unsplash.com/photo-1655313719493-16ebe4906441?q=80&w=1171&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
 };
@@ -101,7 +101,8 @@ export function getMedicalProductDirectImageUrl(product) {
   }
   if (
     hay.includes('tensiometre') &&
-    (hay.includes('electrique') || hay.includes('electronique'))
+    (hay.includes('electrique') || hay.includes('electronique')) &&
+    !hay.includes('bras')
   ) {
     return MEDICAL_PRODUCT_DIRECT_IMAGE_URLS.tensiometreElectrique;
   }

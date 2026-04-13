@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Mail, Facebook, Linkedin } from 'lucide-react';
 
@@ -11,8 +12,11 @@ export default function Footer() {
         <div>
           <p className="font-semibold text-slate-900">{t('footer.legal')}</p>
           <p className="mt-1 max-w-xs">
-            AltheaSystems — commerce électronique. Données traitées conformément à la réglementation applicable.
+            {t('footer.compliance')}
           </p>
+          <Link to="/tests-unitaires" className="mt-2 inline-block text-ocean hover:underline">
+            {t('testsUnit.title')}
+          </Link>
         </div>
         <div>
           <p className="font-semibold text-ink">{t('footer.contact')}</p>

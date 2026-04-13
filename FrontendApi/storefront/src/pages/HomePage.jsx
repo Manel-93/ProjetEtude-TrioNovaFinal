@@ -10,6 +10,9 @@ import { getDefaultMedicalImageUrl, placeholderUrl } from '../utils/catalogFallb
 import { getCategoryCoverImageUrl } from '../utils/categoryImage';
 import { resolveMediaUrl } from '../utils/mediaUrl';
 import ProductCard from '../components/ProductCard';
+import { getProductDisplayName } from '../utils/productLocale';
+import { getCategoryDisplayName, getCategoryDisplayDescription } from '../utils/categoryLocale';
+import { getCarouselSlideTitle, getCarouselSlideSubtitle } from '../utils/carouselLocale';
 
 function useCarouselIndex(length) {
   const [i, setI] = useState(0);
@@ -28,7 +31,7 @@ function useCarouselIndex(length) {
 }
 
 export default function HomePage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['home-products'],
@@ -45,8 +48,7 @@ export default function HomePage() {
     queryFn: async () => {
       const res = await fetchHomeCarousel();
       return res.data?.data || [];
-    },
-    staleTime: 60 * 1000
+    }
   });
 
   const apiSlides = Array.isArray(carouselRaw) ? carouselRaw : [];
@@ -68,8 +70,17 @@ export default function HomePage() {
     return getPrimaryImageUrl(current);
   }, [current, fromApi]);
 
-  const title = current ? (fromApi ? current.title : current.name) : '';
-  const subtitle = current ? (fromApi ? current.subtitle : current.description) : '';
+  const lang = i18n?.language || 'fr';
+  const title = current
+    ? fromApi
+      ? getCarouselSlideTitle(current, lang)
+      : getProductDisplayName(current, lang)
+    : '';
+  const subtitle = current
+    ? fromApi
+      ? getCarouselSlideSubtitle(current, lang)
+      : current.description || ''
+    : '';
 
   const linkHref = useMemo(() => {
     if (!current) return '/';
@@ -203,36 +214,40 @@ export default function HomePage() {
           <p className="text-slate-600">{t('common.loading')}</p>
         ) : (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-            {categories.map((c) => (
-              <Link
-                key={c.id}
-                to={`/catalogue/${c.id}`}
-                className="card overflow-hidden p-0 transition hover:shadow-md"
-              >
-                <div className="aspect-[4/3] bg-slate-100">
-                  <img
-                    src={c.image || categoryFallback}
-                    alt={c.name || 'Catégorie médicale'}
-                    className="h-full w-full object-cover"
-                    loading="lazy"
-                    onError={(e) => {
-                      const next = e.currentTarget.src.includes('source.unsplash.com')
-                        ? categoryFallback
-                        : categoryFinal;
-                      if (e.currentTarget.src !== next) {
-                        e.currentTarget.src = next;
-                      }
-                    }}
-                  />
-                </div>
-                <div className="p-3">
-                  <h3 className="font-semibold text-ink">{c.name}</h3>
-                  {c.description ? (
-                    <p className="mt-1 line-clamp-2 text-xs text-slate-500">{c.description}</p>
-                  ) : null}
-                </div>
-              </Link>
-            ))}
+            {categories.map((c) => {
+              const catTitle = getCategoryDisplayName(c, lang);
+              const catDesc = getCategoryDisplayDescription(c, lang);
+              return (
+                <Link
+                  key={c.id}
+                  to={`/catalogue/${c.id}`}
+                  className="card overflow-hidden p-0 transition hover:shadow-md"
+                >
+                  <div className="aspect-[4/3] bg-slate-100">
+                    <img
+                      src={c.image || categoryFallback}
+                      alt={catTitle || t('common.categoryFallback')}
+                      className="h-full w-full object-cover"
+                      loading="lazy"
+                      onError={(e) => {
+                        const next = e.currentTarget.src.includes('source.unsplash.com')
+                          ? categoryFallback
+                          : categoryFinal;
+                        if (e.currentTarget.src !== next) {
+                          e.currentTarget.src = next;
+                        }
+                      }}
+                    />
+                  </div>
+                  <div className="p-3">
+                    <h3 className="font-semibold text-ink">{catTitle}</h3>
+                    {catDesc ? (
+                      <p className="mt-1 line-clamp-2 text-xs text-slate-500">{catDesc}</p>
+                    ) : null}
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         )}
       </section>

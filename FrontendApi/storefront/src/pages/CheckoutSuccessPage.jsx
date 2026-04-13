@@ -2,10 +2,14 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { finalizePaymentIntent } from '../services/cart';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function CheckoutSuccessPage() {
   const { t } = useTranslation();
+  const qc = useQueryClient();
+  const { refreshProfile } = useAuth();
   const [params] = useSearchParams();
   const redirectStatus = params.get('redirect_status');
   const paymentIntentId = params.get('payment_intent');
@@ -27,7 +31,7 @@ export default function CheckoutSuccessPage() {
     return () => {
       cancelled = true;
     };
-  }, [paymentIntentId]);
+  }, [paymentIntentId, qc, refreshProfile]);
 
   return (
     <div className="mx-auto max-w-lg py-16 text-center">

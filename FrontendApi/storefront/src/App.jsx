@@ -20,6 +20,7 @@ import AccountOrdersPage from './pages/AccountOrdersPage';
 import AccountOrderDetailPage from './pages/AccountOrderDetailPage';
 import ContactPage from './pages/ContactPage';
 import AuthHandoffPage from './pages/AuthHandoffPage';
+import UnitTestsPage from './pages/UnitTestsPage';
 
 export default function App() {
   return (
@@ -38,6 +39,7 @@ export default function App() {
         <Route path="/mot-de-passe-oublie" element={<ForgotPasswordPage />} />
         <Route path="/reinitialiser-mot-de-passe" element={<ResetPasswordPage />} />
         <Route path="/contact" element={<ContactPage />} />
+        <Route path="/tests-unitaires" element={<UnitTestsPage />} />
 
         <Route
           path="/compte"

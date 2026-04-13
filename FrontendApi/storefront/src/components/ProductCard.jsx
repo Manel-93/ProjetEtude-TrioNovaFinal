@@ -2,9 +2,11 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getPrimaryImageUrl, isInStock } from '../utils/product';
 import { getDefaultMedicalImageUrl, placeholderUrl } from '../utils/catalogFallbackImages';
+import { getProductDisplayName } from '../utils/productLocale';
 
 export default function ProductCard({ product, listMode = false }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const title = getProductDisplayName(product, i18n?.language || 'fr');
   const img = getPrimaryImageUrl(product) || getDefaultMedicalImageUrl();
   const stockOk = isInStock(product);
   const price = Number(product.priceTtc ?? product.price_ttc ?? 0).toFixed(2);
@@ -19,7 +21,7 @@ export default function ProductCard({ product, listMode = false }) {
       >
         <img
           src={img}
-          alt={product.name || 'Produit médical'}
+          alt={title || t('common.productFallback')}
           className="h-full w-full object-cover"
           loading="lazy"
           onError={(e) => {
@@ -38,7 +40,7 @@ export default function ProductCard({ product, listMode = false }) {
         ) : null}
       </div>
       <div className="min-w-0 flex-1">
-        <h3 className="line-clamp-2 font-semibold text-ink">{product.name}</h3>
+        <h3 className="line-clamp-2 font-semibold text-ink">{title}</h3>
         <p className="mt-1 text-lg font-bold text-ocean">{t('product.price', { value: price })}</p>
         <p className="mt-1 text-xs text-slate-500">
           {stockOk ? t('product.stock') : t('product.outOfStock')}

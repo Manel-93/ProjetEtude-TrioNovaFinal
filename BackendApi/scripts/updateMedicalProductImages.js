@@ -24,23 +24,31 @@ const URLS = {
   stethoscopeMedical:
     'https://images.unsplash.com/photo-1655313719493-16ebe4906441?q=80&w=1171&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   echographePortable:
-    'https://images.unsplash.com/photo-1691935071222-c008a4ccc2ca?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'https://images.unsplash.com/photo-1691935152546-3a9e05f4010b?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   negatoscopeLed:
     'https://www.drexcomedical.fr/8139-large_default/negatoscope-extra-plat-1-2-plages-led.jpg',
   litMedicaliseElectrique:
     'https://images.unsplash.com/photo-1622878327584-40ac62f6a97b?q=80&w=1114&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   boiteGantsNitriles:
-    'https://plus.unsplash.com/premium_photo-1661431328029-6644cdb0ebee?q=80&w=1169&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'https://images.unsplash.com/photo-1599412227383-b7d4751c8765?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   masquesChirurgicaux:
     'https://plus.unsplash.com/premium_photo-1725075089198-b78f625290bd?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   otoscopeFibreOptique:
-    'https://plus.unsplash.com/premium_photo-1658506978519-20245a6466a3?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'https://images.unsplash.com/photo-1576085898419-d54e840d898f?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   glucometrePrecision:
     'https://images.unsplash.com/photo-1714642596931-2293df25c4a3?q=80&w=1028&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   marteauReflexe:
     'https://plus.unsplash.com/premium_photo-1666262811491-eb4ec08bf6f9?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   autoclaveClasseB:
-    'https://plus.unsplash.com/premium_photo-1661507189943-b87c6ea3589e?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
+    'https://images.unsplash.com/photo-1569932057486-f68b6bad58f2?q=80&w=735&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+  seringues3Corps5ml:
+    'https://images.unsplash.com/photo-1647853042468-a152e59ab9b2?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+  gueridonMedicalInox:
+    'https://images.unsplash.com/photo-1633858051131-56720fb67235?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+  tableExamenElectrique:
+    'https://images.unsplash.com/photo-1691935153114-25b39411e7e3?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+  capteurPlanRadiologie:
+    'https://images.unsplash.com/photo-1584555613497-9ecf9dd06f68?q=80&w=1150&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
 };
 
 function norm(s) {
@@ -52,10 +60,31 @@ function norm(s) {
 
 function urlForProductName(name) {
   const n = norm(name);
+  if (
+    n.includes('seringue') &&
+    n.includes('corps') &&
+    (n.includes('5ml') || n.includes('5 ml'))
+  ) {
+    return URLS.seringues3Corps5ml;
+  }
+  if ((n.includes('gueridon') || n.includes('guerido')) && n.includes('inox')) {
+    return URLS.gueridonMedicalInox;
+  }
+  if (
+    n.includes('table') &&
+    n.includes('examen') &&
+    (n.includes('electrique') || n.includes('electronique'))
+  ) {
+    return URLS.tableExamenElectrique;
+  }
+  if (n.includes('capteur') && n.includes('plan') && n.includes('radiolog')) {
+    return URLS.capteurPlanRadiologie;
+  }
   if (n.includes('thermometre') && n.includes('infrarouge')) return URLS.thermometreInfrarouge;
   if (
     n.includes('tensiometre') &&
-    (n.includes('electrique') || n.includes('electronique'))
+    (n.includes('electrique') || n.includes('electronique')) &&
+    !n.includes('bras')
   ) {
     return URLS.tensiometreElectrique;
   }
