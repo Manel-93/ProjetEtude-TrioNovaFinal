@@ -1,0 +1,149 @@
+{
+  "brand": "AltheaSystems",
+  "nav": {
+    "home": "الرئيسية",
+    "catalog": "الفئات",
+    "search": "بحث",
+    "cart": "السلة",
+    "account": "حسابي",
+    "contact": "اتصل بنا",
+    "login": "تسجيل الدخول",
+    "logout": "تسجيل الخروج"
+  },
+  "header": {
+    "searchPlaceholder": "ابحث عن منتج…",
+    "openMenu": "فتح القائمة",
+    "cartAria": "السلة"
+  },
+  "footer": {
+    "legal": "إشعار قانوني",
+    "contact": "اتصل بنا",
+    "social": "الشبكات الاجتماعية",
+    "rights": "© {{year}} AltheaSystems"
+  },
+  "home": {
+    "carousel": "مختارات",
+    "categories": "الفئات",
+    "topProducts": "الأكثر مبيعاً",
+    "noProducts": "لا توجد منتجات حالياً."
+  },
+  "product": {
+    "price": "{{value}} € شامل الضريبة",
+    "stock": "متوفر",
+    "outOfStock": "نفد المخزون",
+    "addToCart": "أضف إلى السلة",
+    "unavailable": "غير متوفر",
+    "specs": "المواصفات",
+    "similar": "منتجات مشابهة"
+  },
+  "category": {
+    "title": "الفئة",
+    "products": "المنتجات",
+    "empty": "لا توجد منتجات في هذه الفئة."
+  },
+  "search": {
+    "title": "بحث",
+    "filters": "عوامل التصفية",
+    "query": "كلمة البحث",
+    "category": "الفئة",
+    "minPrice": "أقل سعر",
+    "maxPrice": "أعلى سعر",
+    "availability": "التوفر",
+    "inStockOnly": "متوفر فقط",
+    "sort": "الترتيب",
+    "sortPriority": "الأهمية",
+    "sortPriceAsc": "السعر تصاعدياً",
+    "sortPriceDesc": "السعر تنازلياً",
+    "sortNewest": "الأحدث",
+    "sortStock": "التوفر",
+    "results": "{{count}} نتيجة",
+    "noResults": "لا توجد نتائج."
+  },
+  "cart": {
+    "title": "السلة",
+    "empty": "سلتك فارغة.",
+    "qty": "الكمية",
+    "remove": "إزالة",
+    "subtotal": "المجموع قبل الضريبة",
+    "vat": "TVA",
+    "total": "الإجمالي شامل الضريبة",
+    "checkout": "إتمام الطلب",
+    "unavailableLine": "هذا المنتج لم يعد متوفراً",
+    "stockIssue": "مشكلة في المخزون"
+  },
+  "checkout": {
+    "title": "الدفع",
+    "stepAuth": "الحساب",
+    "stepAddress": "العنوان",
+    "stepPayment": "الدفع",
+    "stepConfirm": "التأكيد",
+    "guest": "متابعة كضيف",
+    "loginPrompt": "لديك حساب؟",
+    "registerPrompt": "إنشاء حساب",
+    "pay": "ادفع",
+    "processing": "جاري المعالجة…",
+    "success": "شكراً! تم قبول الدفع.",
+    "successHint": "ستتلقى إيميلاً عند تسجيل الطلب.",
+    "stripeMissing": "يرجى ضبط VITE_STRIPE_PUBLISHABLE_KEY.",
+    "paymentNotReady": "نموذج الدفع لا يزال يُحمّل. انتظر قليلاً ثم أعد المحاولة.",
+    "paymentProcessing": "جاري معالجة الدفع. سيتم إعادة التوجيه أو ستصلك رسالة تأكيد.",
+    "paymentLoading": "جاري الاتصال بـ Stripe… يُفعّل زر الدفع عند جاهزية النموذج.",
+    "paymentLoadError": "تعذّر تحميل نموذج الدفع (الشبكة، مانع الإعلانات، أو مفتاح Stripe)."
+  },
+  "auth": {
+    "loginTitle": "تسجيل الدخول",
+    "loginSubtitle": "الوصول إلى حسابك",
+    "registerTitle": "إنشاء حساب",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "firstName": "الاسم الأول",
+    "lastName": "اسم العائلة",
+    "submitLogin": "دخول",
+    "submitRegister": "إنشاء الحساب",
+    "forgot": "نسيت كلمة المرور؟",
+    "resetTitle": "كلمة مرور جديدة",
+    "adminRedirect": "أنت مسؤول: استخدم لوحة الإدارة.",
+    "showPassword": "إظهار كلمة المرور"
+  },
+  "account": {
+    "title": "حسابي",
+    "profile": "الملف الشخصي",
+    "addresses": "العناوين",
+    "payments": "وسائل الدفع",
+    "orders": "طلباتي",
+    "save": "حفظ",
+    "phone": "الهاتف"
+  },
+  "orders": {
+    "title": "الطلبات",
+    "number": "الطلب",
+    "date": "التاريخ",
+    "status": "الحالة",
+    "total": "Total",
+    "invoice": "فاتورة PDF",
+    "empty": "لا توجد طلبات.",
+    "byYear": "سنة {{year}}"
+  },
+  "contact": {
+    "title": "اتصل بنا",
+    "name": "الاسم",
+    "subject": "الموضوع",
+    "message": "الرسالة",
+    "send": "إرسال",
+    "chatbot": "المساعد",
+    "chatPlaceholder": "اكتب سؤالك…",
+    "human": "يمكن لأحد الموظفين متابعة المحادثة.",
+    "chatWelcome": "مرحبًا بك في AltheaSystems. أنا المساعد الذكي، كيف يمكنني مساعدتك اليوم؟",
+    "chatOpen": "فتح الدردشة",
+    "chatClose": "إغلاق الدردشة",
+    "chatSend": "إرسال الرسالة"
+  },
+  "common": {
+    "loading": "جاري التحميل…",
+    "error": "خطأ",
+    "retry": "إعادة المحاولة",
+    "back": "رجوع",
+    "continue": "متابعة",
+    "lang": "اللغة"
+  }
+}

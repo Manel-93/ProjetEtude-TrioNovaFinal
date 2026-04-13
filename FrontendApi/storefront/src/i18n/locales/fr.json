@@ -1,0 +1,149 @@
+{
+  "brand": "AltheaSystems",
+  "nav": {
+    "home": "Accueil",
+    "catalog": "Catalogue",
+    "search": "Recherche",
+    "cart": "Panier",
+    "account": "Mon compte",
+    "contact": "Contact",
+    "login": "Connexion",
+    "logout": "Déconnexion"
+  },
+  "header": {
+    "searchPlaceholder": "Rechercher un produit…",
+    "openMenu": "Ouvrir le menu",
+    "cartAria": "Panier"
+  },
+  "footer": {
+    "legal": "Mentions légales",
+    "contact": "Contact",
+    "social": "Réseaux sociaux",
+    "rights": "© {{year}} AltheaSystems"
+  },
+  "home": {
+    "carousel": "À la une",
+    "categories": "Catégories",
+    "topProducts": "Produits populaires",
+    "noProducts": "Aucun produit pour le moment."
+  },
+  "product": {
+    "price": "{{value}} € TTC",
+    "stock": "En stock",
+    "outOfStock": "Rupture de stock",
+    "addToCart": "Ajouter au panier",
+    "unavailable": "Indisponible",
+    "specs": "Caractéristiques",
+    "similar": "Produits similaires"
+  },
+  "category": {
+    "title": "Catégorie",
+    "products": "Produits",
+    "empty": "Aucun produit dans cette catégorie."
+  },
+  "search": {
+    "title": "Recherche",
+    "filters": "Filtres",
+    "query": "Mot-clé",
+    "category": "Catégorie",
+    "minPrice": "Prix min",
+    "maxPrice": "Prix max",
+    "availability": "Disponibilité",
+    "inStockOnly": "En stock uniquement",
+    "sort": "Tri",
+    "sortPriority": "Pertinence / priorité",
+    "sortPriceAsc": "Prix croissant",
+    "sortPriceDesc": "Prix décroissant",
+    "sortNewest": "Nouveautés",
+    "sortStock": "Disponibilité",
+    "results": "{{count}} résultat(s)",
+    "noResults": "Aucun résultat."
+  },
+  "cart": {
+    "title": "Panier",
+    "empty": "Votre panier est vide.",
+    "qty": "Quantité",
+    "remove": "Retirer",
+    "subtotal": "Sous-total HT",
+    "vat": "TVA",
+    "total": "Total TTC",
+    "checkout": "Passer à la caisse",
+    "unavailableLine": "Ce produit n'est plus disponible",
+    "stockIssue": "Problème de stock"
+  },
+  "checkout": {
+    "title": "Commande",
+    "stepAuth": "Compte",
+    "stepAddress": "Adresse",
+    "stepPayment": "Paiement",
+    "stepConfirm": "Confirmation",
+    "guest": "Continuer en invité",
+    "loginPrompt": "Déjà un compte ?",
+    "registerPrompt": "Créer un compte",
+    "pay": "Payer",
+    "processing": "Traitement…",
+    "success": "Merci ! Votre paiement a été accepté.",
+    "successHint": "Vous recevrez un email de confirmation lorsque la commande sera enregistrée.",
+    "stripeMissing": "Veuillez configurer VITE_STRIPE_PUBLISHABLE_KEY.",
+    "paymentNotReady": "Le formulaire de paiement charge encore. Patientez une seconde puis réessayez.",
+    "paymentProcessing": "Paiement en cours de traitement. Vous serez redirigé ou recevrez une confirmation par e-mail.",
+    "paymentLoading": "Connexion à Stripe… Le bouton Payer s’active dès que le formulaire est prêt.",
+    "paymentLoadError": "Impossible de charger le formulaire de paiement (réseau, bloqueur de pub ou clé Stripe)."
+  },
+  "auth": {
+    "loginTitle": "Connexion",
+    "loginSubtitle": "Espace client ; les comptes administrateur sont redirigés vers le panneau d’administration",
+    "registerTitle": "Inscription",
+    "email": "Email",
+    "password": "Mot de passe",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "submitLogin": "Se connecter",
+    "submitRegister": "Créer mon compte",
+    "forgot": "Mot de passe oublié ?",
+    "resetTitle": "Nouveau mot de passe",
+    "adminRedirect": "Vous êtes administrateur : utilisez le panneau administrateur.",
+    "showPassword": "Afficher le mot de passe"
+  },
+  "account": {
+    "title": "Mon compte",
+    "profile": "Profil",
+    "addresses": "Adresses",
+    "payments": "Moyens de paiement",
+    "orders": "Mes commandes",
+    "save": "Enregistrer",
+    "phone": "Téléphone"
+  },
+  "orders": {
+    "title": "Commandes",
+    "number": "Commande",
+    "date": "Date",
+    "status": "Statut",
+    "total": "Total",
+    "invoice": "Facture PDF",
+    "empty": "Aucune commande.",
+    "byYear": "Année {{year}}"
+  },
+  "contact": {
+    "title": "Contact",
+    "name": "Nom",
+    "subject": "Sujet",
+    "message": "Message",
+    "send": "Envoyer",
+    "chatbot": "Assistant",
+    "chatPlaceholder": "Posez votre question…",
+    "human": "Un conseiller peut reprendre la conversation.",
+    "chatWelcome": "Bonjour et bienvenue chez AltheaSystems. Je suis votre assistant, comment puis-je vous aider aujourd'hui ?",
+    "chatOpen": "Ouvrir le chat",
+    "chatClose": "Fermer le chat",
+    "chatSend": "Envoyer le message"
+  },
+  "common": {
+    "loading": "Chargement…",
+    "error": "Erreur",
+    "retry": "Réessayer",
+    "back": "Retour",
+    "continue": "Continuer",
+    "lang": "Langue"
+  }
+}

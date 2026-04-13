@@ -1,0 +1,149 @@
+{
+  "brand": "AltheaSystems",
+  "nav": {
+    "home": "Home",
+    "catalog": "Catalog",
+    "search": "Search",
+    "cart": "Cart",
+    "account": "My account",
+    "contact": "Contact",
+    "login": "Sign in",
+    "logout": "Sign out"
+  },
+  "header": {
+    "searchPlaceholder": "Search products…",
+    "openMenu": "Open menu",
+    "cartAria": "Cart"
+  },
+  "footer": {
+    "legal": "Legal notice",
+    "contact": "Contact",
+    "social": "Social networks",
+    "rights": "© {{year}} AltheaSystems"
+  },
+  "home": {
+    "carousel": "Highlights",
+    "categories": "Categories",
+    "topProducts": "Top products",
+    "noProducts": "No products yet."
+  },
+  "product": {
+    "price": "{{value}} € inc. VAT",
+    "stock": "In stock",
+    "outOfStock": "Out of stock",
+    "addToCart": "Add to cart",
+    "unavailable": "Unavailable",
+    "specs": "Specifications",
+    "similar": "Similar products"
+  },
+  "category": {
+    "title": "Category",
+    "products": "Products",
+    "empty": "No products in this category."
+  },
+  "search": {
+    "title": "Search",
+    "filters": "Filters",
+    "query": "Keywords",
+    "category": "Category",
+    "minPrice": "Min price",
+    "maxPrice": "Max price",
+    "availability": "Availability",
+    "inStockOnly": "In stock only",
+    "sort": "Sort",
+    "sortPriority": "Relevance / priority",
+    "sortPriceAsc": "Price ascending",
+    "sortPriceDesc": "Price descending",
+    "sortNewest": "Newest",
+    "sortStock": "Availability",
+    "results": "{{count}} result(s)",
+    "noResults": "No results."
+  },
+  "cart": {
+    "title": "Cart",
+    "empty": "Your cart is empty.",
+    "qty": "Quantity",
+    "remove": "Remove",
+    "subtotal": "Subtotal ex. VAT",
+    "vat": "VAT",
+    "total": "Total inc. VAT",
+    "checkout": "Checkout",
+    "unavailableLine": "This product is no longer available",
+    "stockIssue": "Stock issue"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "stepAuth": "Account",
+    "stepAddress": "Address",
+    "stepPayment": "Payment",
+    "stepConfirm": "Confirmation",
+    "guest": "Continue as guest",
+    "loginPrompt": "Already have an account?",
+    "registerPrompt": "Create an account",
+    "pay": "Pay",
+    "processing": "Processing…",
+    "success": "Thank you! Your payment was accepted.",
+    "successHint": "You will receive a confirmation email when your order is registered.",
+    "stripeMissing": "Please set VITE_STRIPE_PUBLISHABLE_KEY.",
+    "paymentNotReady": "The payment form is still loading. Wait a moment and try again.",
+    "paymentProcessing": "Payment is processing. You will be redirected or receive a confirmation email.",
+    "paymentLoading": "Connecting to Stripe… The Pay button enables once the form is ready.",
+    "paymentLoadError": "Could not load the payment form (network, ad blocker, or Stripe key)."
+  },
+  "auth": {
+    "loginTitle": "Sign in",
+    "loginSubtitle": "Customer area; administrator accounts are redirected to the admin panel",
+    "registerTitle": "Register",
+    "email": "Email",
+    "password": "Password",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "submitLogin": "Sign in",
+    "submitRegister": "Create account",
+    "forgot": "Forgot password?",
+    "resetTitle": "New password",
+    "adminRedirect": "You are an administrator: please use the admin panel.",
+    "showPassword": "Show password"
+  },
+  "account": {
+    "title": "My account",
+    "profile": "Profile",
+    "addresses": "Addresses",
+    "payments": "Payment methods",
+    "orders": "My orders",
+    "save": "Save",
+    "phone": "Phone"
+  },
+  "orders": {
+    "title": "Orders",
+    "number": "Order",
+    "date": "Date",
+    "status": "Status",
+    "total": "Total",
+    "invoice": "Invoice PDF",
+    "empty": "No orders yet.",
+    "byYear": "Year {{year}}"
+  },
+  "contact": {
+    "title": "Contact",
+    "name": "Name",
+    "subject": "Subject",
+    "message": "Message",
+    "send": "Send",
+    "chatbot": "Assistant",
+    "chatPlaceholder": "Ask your question…",
+    "human": "A human can take over the conversation.",
+    "chatWelcome": "Hello and welcome to AltheaSystems. I am your assistant, how can I help you today?",
+    "chatOpen": "Open chat",
+    "chatClose": "Close chat",
+    "chatSend": "Send message"
+  },
+  "common": {
+    "loading": "Loading…",
+    "error": "Error",
+    "retry": "Retry",
+    "back": "Back",
+    "continue": "Continue",
+    "lang": "Language"
+  }
+}

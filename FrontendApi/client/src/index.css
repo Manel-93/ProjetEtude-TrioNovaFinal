@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', 'Trebuchet MS', sans-serif;
+  color: #334155;
+  background: linear-gradient(165deg, #d4f4f7 0%, #ecfdf5 35%, #f8fafc 100%);
+}
+
+.card {
+  @apply rounded-2xl border border-slate-200/90 bg-white/95 shadow-sm backdrop-blur;
+}
+
+.input {
+  @apply w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-ocean focus:ring-2 focus:ring-ocean/25 disabled:bg-slate-100 disabled:text-slate-400;
+}
+
+.btn-primary {
+  @apply inline-flex items-center justify-center rounded-xl bg-ocean px-4 py-2 text-sm font-semibold text-white transition hover:bg-ocean-hover disabled:opacity-50;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-ink transition hover:border-ocean/40 hover:bg-surface disabled:opacity-50;
+}

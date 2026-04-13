@@ -1,0 +1,11 @@
+{
+  "watch": [
+    "src",
+    "index.html",
+    "tailwind.config.js",
+    "postcss.config.js"
+  ],
+  "ext": "js,jsx,css,html",
+  "exec": "npm run build",
+  "delay": "300"
+}

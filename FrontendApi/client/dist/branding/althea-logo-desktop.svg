@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 48" fill="none" aria-hidden="true">
+  <g transform="translate(0,4)">
+    <path fill="#00a8b5" d="M8 18c0-6 5-11 12-11 2.2 0 4.2.6 6 1.6A11 11 0 0 1 38 6c6.6 0 12 5.4 12 12v2H8v-2Z"/>
+    <path fill="#003d5c" d="M8 20h42v4c0 6-5 11-12 11H20c-6.6 0-12-5.4-12-12v-3Z"/>
+    <rect width="14" height="3" x="22" y="15" fill="#fff" rx="1"/>
+    <rect width="3" height="14" x="27.5" y="9.5" fill="#fff" rx="1"/>
+    <rect width="3" height="3" x="44" y="4" fill="#00a8b5" rx="0.5"/>
+    <rect width="3" height="3" x="48" y="2" fill="#00a8b5" rx="0.5"/>
+    <rect width="3" height="3" x="50" y="6" fill="#003d5c" rx="0.5"/>
+  </g>
+  <text x="62" y="22" fill="#003d5c" font-family="system-ui,Segoe UI,sans-serif" font-size="16" font-weight="700">Althea</text>
+  <text x="62" y="38" fill="#003d5c" font-family="system-ui,Segoe UI,sans-serif" font-size="16" font-weight="700">Systems</text>
+</svg>
