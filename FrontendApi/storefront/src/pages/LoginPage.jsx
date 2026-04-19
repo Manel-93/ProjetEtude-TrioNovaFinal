@@ -1,9 +1,10 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Eye, EyeOff } from 'lucide-react';
 import { storage } from '../api/client';
 import { useAuth } from '../contexts/AuthContext';
+import { confirmEmail } from '../services/auth';
 import { getApiError } from '../utils/errors';
 
 const ADMIN_URL = import.meta.env.VITE_ADMIN_URL || 'http://localhost:3000';
@@ -12,23 +13,68 @@ export default function LoginPage() {
   const { t } = useTranslation();
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(storage.getRemember());
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+
+  const redirectTo = useMemo(() => {
+    const from = location.state?.from;
+    if (!from || typeof from.pathname !== 'string' || !from.pathname.startsWith('/')) {
+      return '/';
+    }
+    return `${from.pathname || ''}${from.search || ''}${from.hash || ''}`;
+  }, [location.state]);
+
+  const normalizedError = error.toLowerCase();
+  const showForgotPasswordHint =
+    normalizedError.includes('mot de passe incorrect') ||
+    normalizedError.includes('email ou mot de passe incorrect');
+
+  useEffect(() => {
+    const confirmationToken = searchParams.get('confirmation');
+    if (!confirmationToken) return;
+
+    let cancelled = false;
+    setMessage(t('auth.confirmingAccount'));
+    setError('');
+
+    confirmEmail(confirmationToken)
+      .then(() => {
+        if (cancelled) return;
+        setMessage(t('auth.confirmSuccess'));
+        const nextParams = new URLSearchParams(searchParams);
+        nextParams.delete('confirmation');
+        setSearchParams(nextParams, { replace: true });
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setMessage('');
+        setError(getApiError(err));
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [searchParams, setSearchParams, t]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setMessage('');
     if (!email.trim() || !password) {
-      setError('Email et mot de passe requis.');
+      setError(t('auth.invalidCredentialsRequired'));
       return;
     }
     setLoading(true);
     try {
-      const profile = await login(email.trim(), password);
+      const profile = await login(email.trim(), password, rememberMe);
       if (profile?.role === 'ADMIN') {
         const access = storage.getAccess();
         const refresh = storage.getRefresh();
@@ -41,7 +87,7 @@ export default function LoginPage() {
         window.location.href = `${ADMIN_URL.replace(/\/$/, '')}/auth/handoff#${hash}`;
         return;
       }
-      navigate('/', { replace: true });
+      navigate(redirectTo, { replace: true });
     } catch (err) {
       setError(getApiError(err));
     } finally {
@@ -61,6 +107,11 @@ export default function LoginPage() {
         </div>
 
         <div className="card p-8">
+          {message ? (
+            <div className="mb-5 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+              {message}
+            </div>
+          ) : null}
           {error ? (
             <div className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
               {error}
@@ -107,11 +158,29 @@ export default function LoginPage() {
                 </button>
               </div>
             </div>
+            <label className="flex items-center gap-2 text-sm text-slate-700">
+              <input
+                type="checkbox"
+                className="h-4 w-4 rounded border-slate-300 text-ocean focus:ring-ocean"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                disabled={loading}
+              />
+              <span>{t('auth.rememberMe')}</span>
+            </label>
             <button type="submit" disabled={loading} className="btn-primary w-full py-3 text-base disabled:opacity-60">
               {loading ? t('common.loading') : t('auth.submitLogin')}
             </button>
           </form>
 
+          {showForgotPasswordHint ? (
+            <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+              {t('auth.wrongPasswordHint')}{' '}
+              <Link to="/mot-de-passe-oublie" className="font-medium text-ocean hover:underline">
+                {t('auth.resetPasswordLink')}
+              </Link>
+            </p>
+          ) : null}
           <p className="mt-6 text-center text-sm text-slate-600">
             <Link to="/mot-de-passe-oublie" className="text-ocean hover:underline">
               {t('auth.forgot')}

@@ -185,6 +185,19 @@ export class DashboardService {
     // Messages
     const messages = await this.getPendingMessages();
 
+    const [salesLast7Days] = await pool.execute(`
+      SELECT 
+        DATE_FORMAT(created_at, '%Y-%m-%d') as day_key,
+        DATE_FORMAT(created_at, '%d/%m') as label,
+        COUNT(*) as orders_count,
+        SUM(total) as total_revenue
+      FROM orders
+      WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+        AND status != 'canceled'
+      GROUP BY DATE(created_at)
+      ORDER BY DATE(created_at) ASC
+    `);
+
     return {
       revenue: {
         today: {
@@ -220,7 +233,19 @@ export class DashboardService {
         active: parseInt(productStats[0].active_products),
         lowStock: parseInt(productStats[0].low_stock_products)
       },
+      kpis: {
+        revenue: parseFloat(revenueMonth.total_revenue || 0),
+        orders: parseInt(revenueMonth.orders_count || 0),
+        stockAlerts: stockAlerts.length,
+        unresolvedMessages: messages.totalUnresolved
+      },
       salesByCategory,
+      salesLast7Days: salesLast7Days.map((row) => ({
+        dayKey: row.day_key,
+        label: row.label,
+        orders: parseInt(row.orders_count || 0),
+        value: parseFloat(row.total_revenue || 0)
+      })),
       stockAlerts: stockAlerts.slice(0, 10), // Top 10
       messages
     };

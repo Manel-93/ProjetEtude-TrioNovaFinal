@@ -4,6 +4,24 @@ import Table from '../../components/ui/Table';
 import { getOrders } from '../../services/orderService';
 import { Link } from 'react-router-dom';
 
+function getOrderStatusBadge(status) {
+  const s = String(status || '').toLowerCase();
+  if (s === 'pending') return 'bg-yellow-100 text-yellow-800';
+  if (s === 'processing') return 'bg-sky-100 text-sky-800';
+  if (s === 'completed') return 'bg-emerald-100 text-emerald-800';
+  if (s === 'canceled') return 'bg-red-100 text-red-800';
+  return 'bg-slate-100 text-slate-700';
+}
+
+function getOrderStatusLabel(status) {
+  const s = String(status || '').toLowerCase();
+  if (s === 'pending') return 'En attente';
+  if (s === 'processing') return 'En cours';
+  if (s === 'completed') return 'Finalisée';
+  if (s === 'canceled') return 'Annulée';
+  return status || 'Inconnu';
+}
+
 export default function OrderListPage() {
   const [page, setPage] = useState(1);
   const [error, setError] = useState('');
@@ -52,6 +70,12 @@ export default function OrderListPage() {
           <p className="text-sm text-slate-500">
             Suivi et gestion des commandes clients.
           </p>
+          <div className="mt-3 flex flex-wrap gap-2 text-xs">
+            <span className="rounded-full bg-yellow-100 px-2 py-1 text-yellow-800">En attente</span>
+            <span className="rounded-full bg-sky-100 px-2 py-1 text-sky-800">En cours</span>
+            <span className="rounded-full bg-emerald-100 px-2 py-1 text-emerald-800">Finalisée</span>
+            <span className="rounded-full bg-red-100 px-2 py-1 text-red-800">Annulée</span>
+          </div>
         </div>
       </header>
 
@@ -69,7 +93,22 @@ export default function OrderListPage() {
               <tr key={order.id} className="border-t border-slate-100">
                 <td className="px-4 py-3 text-sm text-slate-800">{order.orderNumber || order.id}</td>
                 <td className="px-4 py-3 text-sm text-slate-700">
-                  {order.customerEmail || order.customerName || '-'}
+                  {(() => {
+                    const name = [order.customerFirstName, order.customerLastName]
+                      .filter(Boolean)
+                      .join(' ')
+                      .trim();
+                    if (name && order.customerEmail) {
+                      return (
+                        <>
+                          <span className="font-medium text-slate-800">{name}</span>
+                          <br />
+                          <span className="text-slate-600">{order.customerEmail}</span>
+                        </>
+                      );
+                    }
+                    return order.customerEmail || name || order.customerName || '-';
+                  })()}
                 </td>
                 <td className="px-4 py-3 text-sm text-slate-700">
                   {order.createdAt ? new Date(order.createdAt).toLocaleString() : '-'}
@@ -78,8 +117,12 @@ export default function OrderListPage() {
                   EUR {Number(order.total || 0).toFixed(2)}
                 </td>
                 <td className="px-4 py-3 text-sm">
-                  <span className="inline-flex rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium capitalize text-slate-700">
-                    {order.status}
+                  <span
+                    className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${getOrderStatusBadge(
+                      order.status
+                    )}`}
+                  >
+                    {getOrderStatusLabel(order.status)}
                   </span>
                 </td>
                 <td className="px-4 py-3 text-sm text-right text-ocean">

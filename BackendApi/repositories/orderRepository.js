@@ -2,10 +2,16 @@ import { getMySQLConnection } from '../config/database.js';
 
 export class OrderRepository {
   mapRowToObject(row) {
+    const splitList = (value) =>
+      value ? String(value).split('||').map((entry) => entry.trim()).filter(Boolean) : [];
+
     return {
       id: row.id,
       orderNumber: row.order_number,
       userId: row.user_id,
+      customerEmail: row.customer_email || null,
+      customerFirstName: row.customer_first_name || null,
+      customerLastName: row.customer_last_name || null,
       paymentId: row.payment_id,
       cartId: row.cart_id,
       subtotal: parseFloat(row.subtotal),
@@ -13,9 +19,21 @@ export class OrderRepository {
       total: parseFloat(row.total),
       currency: row.currency,
       status: row.status,
+      statusGroup:
+        row.status === 'canceled'
+          ? 'resiliee'
+          : row.status === 'completed'
+            ? 'terminee'
+            : 'active',
       shippingAddress: row.shipping_address ? (typeof row.shipping_address === 'string' ? JSON.parse(row.shipping_address) : row.shipping_address) : null,
       billingAddress: row.billing_address ? (typeof row.billing_address === 'string' ? JSON.parse(row.billing_address) : row.billing_address) : null,
       metadata: row.metadata ? (typeof row.metadata === 'string' ? JSON.parse(row.metadata) : row.metadata) : null,
+      primaryProductName: row.primary_product_name || null,
+      productNames: splitList(row.product_names),
+      productTypes: splitList(row.product_types),
+      itemCount: row.item_count != null ? parseInt(row.item_count, 10) : undefined,
+      paymentLast4: row.payment_last4 || null,
+      paymentBrand: row.payment_brand || null,
       createdAt: row.created_at,
       updatedAt: row.updated_at
     };
@@ -118,14 +136,98 @@ export class OrderRepository {
   }
 
   // Trouver les commandes d'un utilisateur
-  async findByUserId(userId, limit = 50, offset = 0) {
+  buildUserOrdersFilters(filters = {}) {
+    const clauses = [];
+    const params = [];
+
+    if (filters.year) {
+      clauses.push('YEAR(o.created_at) = ?');
+      params.push(parseInt(filters.year, 10));
+    }
+
+    if (filters.search) {
+      const searchTerm = `%${String(filters.search).trim()}%`;
+      clauses.push('(o.order_number LIKE ? OR DATE_FORMAT(o.created_at, "%d/%m/%Y") LIKE ? OR agg.product_names LIKE ?)');
+      params.push(searchTerm, searchTerm, searchTerm);
+    }
+
+    if (filters.productType) {
+      clauses.push('agg.product_types LIKE ?');
+      params.push(`%${filters.productType}%`);
+    }
+
+    if (filters.state === 'active') {
+      clauses.push("o.status IN ('pending', 'processing')");
+    } else if (filters.state === 'resiliee') {
+      clauses.push("o.status = 'canceled'");
+    } else if (filters.state === 'terminee') {
+      clauses.push("o.status = 'completed'");
+    }
+
+    return { clauses, params };
+  }
+
+  // Trouver les commandes d'un utilisateur avec filtres
+  async findByUserId(userId, filters = {}, limit = 50, offset = 0) {
     const pool = await getMySQLConnection();
+    const aggregateQuery = `
+      LEFT JOIN (
+        SELECT
+          oi.order_id,
+          SUBSTRING_INDEX(GROUP_CONCAT(oi.product_name ORDER BY oi.id SEPARATOR '||'), '||', 1) AS primary_product_name,
+          GROUP_CONCAT(DISTINCT oi.product_name SEPARATOR '||') AS product_names,
+          GROUP_CONCAT(DISTINCT COALESCE(c.name, 'Autre') SEPARATOR '||') AS product_types,
+          COUNT(*) AS item_count
+        FROM order_items oi
+        LEFT JOIN products p ON p.id = oi.product_id
+        LEFT JOIN categories c ON c.id = p.category_id
+        GROUP BY oi.order_id
+      ) agg ON agg.order_id = o.id
+    `;
+    const { clauses, params } = this.buildUserOrdersFilters(filters);
+    const whereClause = clauses.length ? ` AND ${clauses.join(' AND ')}` : '';
+
     const [rows] = await pool.execute(
-      'SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?',
-      [userId, limit, offset]
+      `SELECT o.*, agg.primary_product_name, agg.product_names, agg.product_types, agg.item_count,
+              pm.last4 AS payment_last4, pm.brand AS payment_brand
+       FROM orders o
+       ${aggregateQuery}
+       LEFT JOIN payment_methods pm ON pm.user_id = o.user_id AND pm.is_default = 1
+       WHERE o.user_id = ?${whereClause}
+       ORDER BY o.created_at DESC
+       LIMIT ? OFFSET ?`,
+      [userId, ...params, limit, offset]
     );
 
     return rows.map(row => this.mapRowToObject(row));
+  }
+
+  async countByUserId(userId, filters = {}) {
+    const pool = await getMySQLConnection();
+    const aggregateQuery = `
+      LEFT JOIN (
+        SELECT
+          oi.order_id,
+          GROUP_CONCAT(DISTINCT oi.product_name SEPARATOR '||') AS product_names,
+          GROUP_CONCAT(DISTINCT COALESCE(c.name, 'Autre') SEPARATOR '||') AS product_types
+        FROM order_items oi
+        LEFT JOIN products p ON p.id = oi.product_id
+        LEFT JOIN categories c ON c.id = p.category_id
+        GROUP BY oi.order_id
+      ) agg ON agg.order_id = o.id
+    `;
+    const { clauses, params } = this.buildUserOrdersFilters(filters);
+    const whereClause = clauses.length ? ` AND ${clauses.join(' AND ')}` : '';
+
+    const [rows] = await pool.execute(
+      `SELECT COUNT(*) AS total
+       FROM orders o
+       ${aggregateQuery}
+       WHERE o.user_id = ?${whereClause}`,
+      [userId, ...params]
+    );
+
+    return parseInt(rows[0]?.total || 0, 10);
   }
 
   // Trouver toutes les commandes (admin)
@@ -134,27 +236,35 @@ export class OrderRepository {
     const { page = 1, limit = 50 } = pagination;
     const offset = (page - 1) * limit;
     
-    let query = 'SELECT * FROM orders WHERE 1=1';
+    let query = `
+      SELECT o.*,
+        u.email AS customer_email,
+        u.first_name AS customer_first_name,
+        u.last_name AS customer_last_name
+      FROM orders o
+      LEFT JOIN users u ON u.id = o.user_id
+      WHERE 1=1
+    `;
     const params = [];
 
     if (filters.status) {
-      query += ' AND status = ?';
+      query += ' AND o.status = ?';
       params.push(filters.status);
     }
     if (filters.userId) {
-      query += ' AND user_id = ?';
+      query += ' AND o.user_id = ?';
       params.push(filters.userId);
     }
     if (filters.orderNumber) {
-      query += ' AND order_number LIKE ?';
+      query += ' AND o.order_number LIKE ?';
       params.push(`%${filters.orderNumber}%`);
     }
     if (filters.dateFrom) {
-      query += ' AND created_at >= ?';
+      query += ' AND o.created_at >= ?';
       params.push(filters.dateFrom);
     }
     if (filters.dateTo) {
-      query += ' AND created_at <= ?';
+      query += ' AND o.created_at <= ?';
       params.push(filters.dateTo);
     }
 
@@ -165,32 +275,33 @@ export class OrderRepository {
     const safeSortBy = allowedSortFields.includes(sortBy) ? sortBy : 'created_at';
     const safeSortOrder = sortOrder.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
     
-    query += ` ORDER BY ${safeSortBy} ${safeSortOrder} LIMIT ? OFFSET ?`;
+    const sortColumn = safeSortBy === 'order_number' ? 'o.order_number' : `o.${safeSortBy}`;
+    query += ` ORDER BY ${sortColumn} ${safeSortOrder} LIMIT ? OFFSET ?`;
     params.push(limit, offset);
 
     const [rows] = await pool.execute(query, params);
     
     // Compter le total
-    let countQuery = 'SELECT COUNT(*) as total FROM orders WHERE 1=1';
+    let countQuery = 'SELECT COUNT(*) as total FROM orders o WHERE 1=1';
     const countParams = [];
     if (filters.userId) {
-      countQuery += ' AND user_id = ?';
+      countQuery += ' AND o.user_id = ?';
       countParams.push(filters.userId);
     }
     if (filters.status) {
-      countQuery += ' AND status = ?';
+      countQuery += ' AND o.status = ?';
       countParams.push(filters.status);
     }
     if (filters.orderNumber) {
-      countQuery += ' AND order_number LIKE ?';
+      countQuery += ' AND o.order_number LIKE ?';
       countParams.push(`%${filters.orderNumber}%`);
     }
     if (filters.dateFrom) {
-      countQuery += ' AND created_at >= ?';
+      countQuery += ' AND o.created_at >= ?';
       countParams.push(filters.dateFrom);
     }
     if (filters.dateTo) {
-      countQuery += ' AND created_at <= ?';
+      countQuery += ' AND o.created_at <= ?';
       countParams.push(filters.dateTo);
     }
     

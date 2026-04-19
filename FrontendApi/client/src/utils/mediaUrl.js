@@ -30,5 +30,15 @@ export function resolveMediaUrl(url) {
     return t;
   }
 
-  return t;
+  const explicit = import.meta.env.VITE_PUBLIC_API_ORIGIN;
+  if (explicit) {
+    return `${String(explicit).replace(/\/$/, '')}/${t.replace(/^\.\//, '').replace(/^\/+/, '')}`;
+  }
+  if (import.meta.env.DEV && typeof window !== 'undefined') {
+    const { hostname, protocol } = window.location;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return `${protocol}//${hostname}:5000/${t.replace(/^\.\//, '').replace(/^\/+/, '')}`;
+    }
+  }
+  return `/${t.replace(/^\.\//, '').replace(/^\/+/, '')}`;
 }

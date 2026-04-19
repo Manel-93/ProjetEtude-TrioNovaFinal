@@ -1,6 +1,8 @@
 import { OrderRepository } from '../repositories/orderRepository.js';
 import { ProductRepository } from '../repositories/productRepository.js';
 import { AddressRepository } from '../repositories/addressRepository.js';
+import { PaymentRepository } from '../repositories/paymentRepository.js';
+import { PaymentMethodRepository } from '../repositories/paymentMethodRepository.js';
 import { UserRepository } from '../repositories/userRepository.js';
 import { InvoiceService } from './invoiceService.js';
 
@@ -9,6 +11,8 @@ export class OrderService {
     this.orderRepository = new OrderRepository();
     this.productRepository = new ProductRepository();
     this.addressRepository = new AddressRepository();
+    this.paymentRepository = new PaymentRepository();
+    this.paymentMethodRepository = new PaymentMethodRepository();
     this.userRepository = new UserRepository();
     this.invoiceService = new InvoiceService();
   }
@@ -126,16 +130,26 @@ export class OrderService {
       for (const item of metadata.cartItems) {
         const product = await this.productRepository.findById(item.productId);
         if (product) {
+          const unitTtc =
+            item.price != null && Number(item.price) > 0
+              ? Number(item.price)
+              : Number(product.priceTtc || 0);
+          const unitHt =
+            product.priceHt != null
+              ? Number(product.priceHt)
+              : unitTtc / (1 + Number(product.tva || 0) / 100);
+          const lineSubtotal = unitHt * item.quantity;
+          const lineTotal = unitTtc * item.quantity;
           await this.orderRepository.addItem(order.id, {
             productId: item.productId,
             productName: product.name,
             productSlug: product.slug,
             quantity: item.quantity,
-            unitPriceHt: product.priceHt,
-            unitPriceTtc: item.price,
+            unitPriceHt: unitHt,
+            unitPriceTtc: unitTtc,
             tva: product.tva,
-            subtotal: product.priceHt * item.quantity,
-            total: item.price * item.quantity
+            subtotal: lineSubtotal,
+            total: lineTotal
           });
         }
       }
@@ -162,14 +176,116 @@ export class OrderService {
       throw new Error('Accès non autorisé à cette commande');
     }
 
-    const items = await this.orderRepository.getOrderItems(orderId);
+    let items = await this.orderRepository.getOrderItems(orderId);
+    items = items.map((it) => {
+      const q = Number(it.quantity) || 0;
+      const total = Number(it.total) || 0;
+      let unitTtc = Number(it.unitPriceTtc) || 0;
+      if (unitTtc <= 0 && q > 0 && total > 0) {
+        unitTtc = total / q;
+      }
+      return { ...it, unitPriceTtc: unitTtc };
+    });
     const statusHistory = await this.orderRepository.getStatusHistory(orderId);
     const invoice = await this.invoiceService.getInvoiceByOrderId(orderId);
+    const payment = order.paymentId ? await this.paymentRepository.findById(order.paymentId) : null;
+    const paymentMethods = order.userId ? await this.paymentMethodRepository.findByUserId(order.userId) : [];
+
+    const parseMeta = (m) => {
+      if (!m) return {};
+      return typeof m === 'string' ? (() => { try { return JSON.parse(m); } catch { return {}; } })() : m;
+    };
+    const payMeta = parseMeta(payment?.metadata);
+
+    const orderCreatedMs = order.createdAt ? new Date(order.createdAt).getTime() : Date.now();
+    const methodsChrono = [...paymentMethods].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+    const methodNearOrder = methodsChrono.find(
+      (m) => new Date(m.createdAt).getTime() <= orderCreatedMs + 120000
+    );
+
+    const brandLabel = (b) => (b ? String(b).replace(/_/g, ' ') : '');
+    let paymentSummary = null;
+    if (payMeta.paymentMethodLabel) {
+      paymentSummary = {
+        type: payMeta.paymentMethodType || 'card',
+        brand: payMeta.cardBrand || payMeta.brand || null,
+        last4: payMeta.cardLast4 || payMeta.last4 || null,
+        label: payMeta.paymentMethodLabel
+      };
+    } else if (methodNearOrder) {
+      paymentSummary = {
+        type: methodNearOrder.type || 'card',
+        brand: methodNearOrder.brand || null,
+        last4: methodNearOrder.last4 || null,
+        label: null
+      };
+    } else {
+      const fallback = paymentMethods.find((method) => method.isDefault) || paymentMethods[0] || null;
+      paymentSummary = fallback
+        ? {
+            type: fallback.type || 'card',
+            brand: fallback.brand || null,
+            last4: fallback.last4 || null,
+            label: null
+          }
+        : { type: 'card', brand: null, last4: null, label: null };
+    }
+
+    const buildPaymentMethodLabel = () => {
+      if (paymentSummary?.label) return paymentSummary.label;
+      const type = (paymentSummary?.type || '').toLowerCase();
+      const typeFr =
+        type === 'card'
+          ? 'Carte bancaire'
+          : type
+            ? type.charAt(0).toUpperCase() + type.slice(1)
+            : 'Paiement en ligne';
+      const brand = brandLabel(paymentSummary?.brand);
+      const last = paymentSummary?.last4 ? `···· ${paymentSummary.last4}` : '';
+      return [typeFr, brand, last].filter(Boolean).join(' · ');
+    };
+
+    const paymentMethodLabel = buildPaymentMethodLabel();
+
+    let customer = null;
+    if (order.userId) {
+      const u = await this.userRepository.findById(order.userId);
+      if (u) {
+        const displayName = [u.first_name, u.last_name].filter(Boolean).join(' ').trim();
+        customer = {
+          id: u.id,
+          email: u.email,
+          firstName: u.first_name,
+          lastName: u.last_name,
+          phone: u.phone,
+          displayName: displayName || u.email
+        };
+      }
+    }
 
     return {
       ...order,
       items,
       statusHistory,
+      customer,
+      paymentMethodLabel,
+      payment: payment
+        ? {
+            id: payment.id,
+            status: payment.status,
+            amount: payment.amount,
+            currency: payment.currency,
+            summary: { ...paymentSummary, label: paymentMethodLabel }
+          }
+        : {
+            id: null,
+            status: null,
+            amount: order.total,
+            currency: order.currency,
+            summary: { ...paymentSummary, label: paymentMethodLabel }
+          },
       invoice: invoice ? {
         id: invoice.id,
         invoiceNumber: invoice.invoiceNumber,
@@ -180,18 +296,20 @@ export class OrderService {
   }
 
   // Récupérer les commandes d'un utilisateur
-  async getUserOrders(userId, pagination = {}) {
+  async getUserOrders(userId, filters = {}, pagination = {}) {
     const { page = 1, limit = 20 } = pagination;
     const offset = (page - 1) * limit;
     
-    const orders = await this.orderRepository.findByUserId(userId, limit, offset);
+    const orders = await this.orderRepository.findByUserId(userId, filters, limit, offset);
+    const total = await this.orderRepository.countByUserId(userId, filters);
     
     return {
       data: orders,
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),
-        total: orders.length
+        total,
+        totalPages: Math.ceil(total / limit)
       }
     };
   }

@@ -400,6 +400,17 @@ export class StripeService {
 
       if (!paymentMethodId) return;
 
+      const brandUp = card?.brand ? String(card.brand).replace(/_/g, ' ').toUpperCase() : '';
+      const labelParts = ['Carte bancaire'];
+      if (brandUp) labelParts.push(brandUp);
+      if (card?.last4) labelParts.push(`···· ${card.last4}`);
+      await this.paymentRepository.mergeMetadataById(payment.id, {
+        paymentMethodType: 'card',
+        paymentMethodLabel: labelParts.join(' · '),
+        cardBrand: card?.brand || null,
+        cardLast4: card?.last4 || null
+      });
+
       const exists = await this.paymentMethodRepository.findByUserIdAndStripePaymentMethodId(
         payment.userId,
         paymentMethodId

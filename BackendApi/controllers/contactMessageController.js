@@ -15,6 +15,10 @@ export class ContactMessageController {
         message: req.body.message,
         userId: req.user?.userId || null,
         metadata: {
+          source: req.body.source || 'contact_form',
+          sessionId: req.body.sessionId || null,
+          category: req.body.category || null,
+          context: req.body.context || null,
           ipAddress: req.ip,
           userAgent: req.get('user-agent')
         }

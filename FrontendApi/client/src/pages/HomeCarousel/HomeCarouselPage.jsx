@@ -4,7 +4,11 @@ import { ArrowDown, ArrowUp, Download, Plus, Trash2 } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import { getProducts } from '../../services/productService';
-import { getAdminHomeCarousel, putAdminHomeCarousel } from '../../services/homeCarouselApiService';
+import {
+  getAdminHomeCarousel,
+  putAdminHomeCarousel,
+  uploadAdminHomeCarouselImages
+} from '../../services/homeCarouselApiService';
 import { resolveMediaUrl } from '../../utils/mediaUrl';
 
 function primaryProductImageUrl(product) {
@@ -57,6 +61,8 @@ function slidesToPayload(list) {
 export default function HomeCarouselPage() {
   const queryClient = useQueryClient();
   const [slides, setSlides] = useState([]);
+  const [dragIndex, setDragIndex] = useState(null);
+  const [uploading, setUploading] = useState(false);
   const [saveMsg, setSaveMsg] = useState('');
   const [saveError, setSaveError] = useState('');
 
@@ -150,6 +156,28 @@ export default function HomeCarouselPage() {
     persistLocal(copy);
   };
 
+  const onDropUpload = async (event) => {
+    event.preventDefault();
+    const files = Array.from(event.dataTransfer?.files || []).filter((file) => file.type.startsWith('image/'));
+    if (!files.length) return;
+    setUploading(true);
+    setSaveError('');
+    try {
+      const res = await uploadAdminHomeCarouselImages(files);
+      const uploaded = res.data.data || [];
+      const mapped = uploaded.map((file) => ({
+        ...createEmptySlide(),
+        imageUrl: file.url
+      }));
+      persistLocal([...slides, ...mapped]);
+      setSaveMsg(`${mapped.length} image(s) ajoutée(s). Pensez à enregistrer.`);
+    } catch (err) {
+      setSaveError(err?.response?.data?.error?.message || "Impossible d'uploader les images.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const downloadJson = () => {
     const blob = new Blob([JSON.stringify(slidesToPayload(slides), null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
@@ -204,6 +232,15 @@ export default function HomeCarouselPage() {
         </span>
       </div>
 
+      <div
+        className="card border-dashed p-5 text-sm text-slate-600"
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={onDropUpload}
+      >
+        Déposez ici plusieurs images pour les uploader et créer automatiquement des diapositives.
+        {uploading ? <span className="ml-2 text-ocean">Upload en cours...</span> : null}
+      </div>
+
       {isLoading ? <div className="card p-6 text-sm text-slate-500">Chargement…</div> : null}
 
       {!isLoading && slides.length === 0 ? (
@@ -213,7 +250,22 @@ export default function HomeCarouselPage() {
       {!isLoading && slides.length > 0 ? (
         <div className="space-y-3">
           {slides.map((slide, index) => (
-            <div key={slide.key} className="card p-4">
+            <div
+              key={slide.key}
+              className="card p-4"
+              draggable
+              onDragStart={() => setDragIndex(index)}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={() => {
+                if (dragIndex == null || dragIndex === index) return;
+                const copy = [...slides];
+                const [moved] = copy.splice(dragIndex, 1);
+                copy.splice(index, 0, moved);
+                setDragIndex(null);
+                persistLocal(copy);
+              }}
+              onDragEnd={() => setDragIndex(null)}
+            >
               <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                 <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                   Diapositive {index + 1}

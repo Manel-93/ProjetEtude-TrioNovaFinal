@@ -38,6 +38,7 @@ export default function App() {
         <Route path="/inscription" element={<RegisterPage />} />
         <Route path="/mot-de-passe-oublie" element={<ForgotPasswordPage />} />
         <Route path="/reinitialiser-mot-de-passe" element={<ResetPasswordPage />} />
+        <Route path="/outils" element={<ContactPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/tests-unitaires" element={<UnitTestsPage />} />
 

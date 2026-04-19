@@ -124,6 +124,7 @@ vi.mock('../contexts/AuthContext', () => ({
 
 vi.mock('../api/client', () => ({
   storage: {
+    getRemember: vi.fn(() => false),
     setAccess: vi.fn(),
     setRefresh: vi.fn()
   }
@@ -156,6 +157,7 @@ vi.mock('../services/search', () => ({
 }));
 
 vi.mock('../services/auth', () => ({
+  confirmEmail: vi.fn(async () => ({ data: { success: true } })),
   register: vi.fn(async () => ({ data: { success: true } })),
   forgotPassword: vi.fn(async () => ({ data: { success: true } })),
   resetPassword: vi.fn(async () => ({ data: { success: true } }))

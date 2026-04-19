@@ -59,6 +59,24 @@ export class PaymentRepository {
     return rows.length > 0 ? this.mapRowToObject(rows[0]) : null;
   }
 
+  /** Fusionne des champs dans metadata JSON (par id interne). */
+  async mergeMetadataById(id, patch) {
+    if (!id || !patch || typeof patch !== 'object') return this.findById(id);
+    const current = await this.findById(id);
+    if (!current) return null;
+    const base =
+      current.metadata && typeof current.metadata === 'string'
+        ? JSON.parse(current.metadata)
+        : current.metadata || {};
+    const next = { ...base, ...patch };
+    const pool = await getMySQLConnection();
+    await pool.execute(
+      'UPDATE payments SET metadata = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+      [JSON.stringify(next), id]
+    );
+    return this.findById(id);
+  }
+
   // Mettre à jour le statut d'un paiement
   async updateStatus(paymentIntentId, status, metadata = null) {
     const pool = await getMySQLConnection();

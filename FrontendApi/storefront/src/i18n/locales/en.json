@@ -93,7 +93,7 @@
   },
   "auth": {
     "loginTitle": "Sign in",
-    "loginSubtitle": "Customer area; administrator accounts are redirected to the admin panel",
+    "loginSubtitle": "Customer area",
     "registerTitle": "Register",
     "email": "Email",
     "password": "Password",
@@ -102,6 +102,12 @@
     "submitLogin": "Sign in",
     "submitRegister": "Create account",
     "forgot": "Forgot password?",
+    "rememberMe": "Remember me",
+    "invalidCredentialsRequired": "Email and password are required.",
+    "wrongPasswordHint": "Wrong password?",
+    "resetPasswordLink": "Reset my password",
+    "confirmingAccount": "Confirming your account...",
+    "confirmSuccess": "Your registration is confirmed. You can now sign in.",
     "resetTitle": "New password",
     "adminRedirect": "You are an administrator: please use the admin panel.",
     "showPassword": "Show password"
@@ -126,7 +132,15 @@
     "fetchError": "Could not load your payment methods.",
     "emptyTitle": "No payment method saved yet.",
     "emptyDescription": "Your future cards will appear here after your first successful payment.",
-    "emptyHint": "Tip: complete a checkout with card payment to automatically register it on your account."
+    "emptyHint": "Tip: complete a checkout with card payment to automatically register it on your account.",
+    "addTitle": "Add a bank card",
+    "addDescription": "Fill in only the required details for secure display.",
+    "brandLabel": "Card type",
+    "last4Label": "Last 4 digits",
+    "expiryMonthLabel": "Expiry month",
+    "expiryYearLabel": "Expiry year",
+    "addButton": "Add card",
+    "last4Invalid": "Please enter exactly 4 digits."
   },
   "testsUnit": {
     "title": "Unit tests",

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { Download } from 'lucide-react';
 import { deleteProduct, getProducts } from '../../services/productService';
 import ProductTable from '../../components/ProductTable';
 import BulkActions from '../../components/BulkActions';
@@ -51,8 +52,14 @@ export default function ProductsList() {
       if (sortBy === 'name') {
         return a.name.localeCompare(b.name) * factor;
       }
-      if (sortBy === 'price') {
+      if (sortBy === 'priceHt') {
+        return (Number(a.priceHt || 0) - Number(b.priceHt || 0)) * factor;
+      }
+      if (sortBy === 'priceTtc') {
         return (Number(a.priceTtc || 0) - Number(b.priceTtc || 0)) * factor;
+      }
+      if (sortBy === 'tva') {
+        return (Number(a.tva || 0) - Number(b.tva || 0)) * factor;
       }
       if (sortBy === 'category') {
         return String(a.categoryId ?? '').localeCompare(String(b.categoryId ?? '')) * factor;
@@ -154,6 +161,35 @@ export default function ProductsList() {
     setSelectedIds(new Set());
   };
 
+  const exportCsv = () => {
+    const rows = [
+      ['Image', 'Nom', 'Prix HT', 'TVA', 'Prix TTC', 'Stock', 'Statut'],
+      ...sortedItems.map((item) => {
+        const img = item?.images?.[0]?.url || '';
+        const status = Number(item.stock || 0) > 0 ? 'Disponible' : 'Rupture';
+        return [
+          img,
+          item.name || '',
+          Number(item.priceHt || 0).toFixed(2),
+          Number(item.tva || 0).toFixed(2),
+          Number(item.priceTtc || 0).toFixed(2),
+          String(item.stock || 0),
+          status
+        ];
+      })
+    ];
+    const csv = rows
+      .map((r) => r.map((cell) => `"${String(cell).replaceAll('"', '""')}"`).join(';'))
+      .join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'catalogue-produits.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <section className="space-y-4">
       <div className="card p-4">
@@ -167,7 +203,13 @@ export default function ProductsList() {
             />
             <button className="btn-secondary" type="submit">Rechercher</button>
           </form>
-          <Link className="btn-primary" to="/admin/products/new">Nouveau produit</Link>
+          <div className="flex gap-2">
+            <button className="btn-secondary inline-flex items-center gap-2" type="button" onClick={exportCsv}>
+              <Download className="h-4 w-4" />
+              Export CSV
+            </button>
+            <Link className="btn-primary" to="/admin/products/new">Nouveau produit</Link>
+          </div>
         </div>
       </div>
 

@@ -169,6 +169,7 @@ router.get('/:id', authenticate, orderController.getOrderById);
  *         description: Accès refusé (admin requis)
  */
 router.get('/admin/orders', authenticate, isAdmin, orderController.getAllOrders);
+router.get('/admin/orders/:id', authenticate, isAdmin, orderController.getOrderByIdAdmin);
 
 /**
  * @swagger

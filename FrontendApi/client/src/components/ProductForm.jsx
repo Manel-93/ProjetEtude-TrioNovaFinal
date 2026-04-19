@@ -47,6 +47,7 @@ export default function ProductForm({
       description: '',
       categoryId: '',
       priceHt: '',
+      tva: 20,
       stock: '',
       slug: '',
       technicalSpecs: {},
@@ -87,6 +88,7 @@ export default function ProductForm({
     if (!String(form.categoryId).trim()) next.categoryId = 'La catégorie est requise.';
     if (!String(form.priceHt).trim()) next.priceHt = 'Le prix est requis.';
     if (Number(form.priceHt) <= 0) next.priceHt = 'Le prix HT doit être strictement positif.';
+    if (Number(form.tva) < 0 || Number(form.tva) > 100) next.tva = 'La TVA doit être comprise entre 0 et 100.';
     if (!String(form.stock).trim()) next.stock = 'Le stock est requis.';
     if (Number(form.stock) < 0) next.stock = 'Le stock ne peut pas être négatif.';
 
@@ -98,6 +100,13 @@ export default function ProductForm({
 
     return next;
   };
+
+  const computedPriceTtc = useMemo(() => {
+    const ht = Number(form.priceHt || 0);
+    const tva = Number(form.tva || 0);
+    if (!Number.isFinite(ht) || !Number.isFinite(tva)) return 0;
+    return ht * (1 + tva / 100);
+  }, [form.priceHt, form.tva]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -125,6 +134,7 @@ export default function ProductForm({
       description: String(form.description).trim(),
       categoryId: Number(form.categoryId),
       priceHt: Number(form.priceHt),
+      tva: Number(form.tva),
       stock: Number(form.stock),
       slug: String(form.slug || slugify(form.name) || `produit-${Date.now()}`).trim(),
       technicalSpecs,
@@ -148,7 +158,7 @@ export default function ProductForm({
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="md:col-span-2">
-          <label className="mb-1 block text-sm font-medium text-slate-700">Name *</label>
+          <label className="mb-1 block text-sm font-medium text-slate-700">Nom *</label>
           <input className="input" value={form.name} onChange={(e) => setField('name', e.target.value)} />
           {fieldError('name')}
         </div>
@@ -160,9 +170,9 @@ export default function ProductForm({
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700">Category *</label>
+          <label className="mb-1 block text-sm font-medium text-slate-700">Catégorie *</label>
           <select className="input" value={form.categoryId} onChange={(e) => setField('categoryId', e.target.value)}>
-            <option value="">Select category</option>
+            <option value="">Sélectionner une catégorie</option>
             {categories.map((category) => (
               <option key={category.id} value={category.id}>{category.name}</option>
             ))}
@@ -171,7 +181,7 @@ export default function ProductForm({
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700">Price *</label>
+          <label className="mb-1 block text-sm font-medium text-slate-700">Prix HT *</label>
           <input
             className="input"
             type="number"
@@ -184,7 +194,26 @@ export default function ProductForm({
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700">Stock Quantity *</label>
+          <label className="mb-1 block text-sm font-medium text-slate-700">TVA (%) *</label>
+          <input
+            className="input"
+            type="number"
+            min="0"
+            max="100"
+            step="0.1"
+            value={form.tva}
+            onChange={(e) => setField('tva', e.target.value)}
+          />
+          {fieldError('tva')}
+        </div>
+
+        <div>
+          <label className="mb-1 block text-sm font-medium text-slate-700">Prix TTC (calcul automatique)</label>
+          <input className="input bg-slate-50" value={computedPriceTtc.toFixed(2)} disabled />
+        </div>
+
+        <div>
+          <label className="mb-1 block text-sm font-medium text-slate-700">Quantité en stock *</label>
           <input
             className="input"
             type="number"
@@ -201,7 +230,7 @@ export default function ProductForm({
           <div className="flex gap-2">
             <input className="input" value={form.slug} onChange={(e) => setField('slug', e.target.value)} />
             <button type="button" className="btn-secondary whitespace-nowrap" onClick={() => setField('slug', slugify(form.name))}>
-              Auto
+              Auto-générer
             </button>
           </div>
         </div>
@@ -209,13 +238,13 @@ export default function ProductForm({
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-slate-800">Technical Characteristics</h3>
+          <h3 className="text-sm font-semibold text-slate-800">Caractéristiques techniques</h3>
           <button
             type="button"
             className="btn-secondary"
             onClick={() => setSpecRows((prev) => [...prev, { key: '', value: '' }])}
           >
-            Add
+            Ajouter
           </button>
         </div>
         <div className="space-y-2">
@@ -223,13 +252,13 @@ export default function ProductForm({
             <div key={`spec-${index}`} className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_1fr_auto]">
               <input
                 className="input"
-                placeholder="Characteristic"
+                placeholder="Caractéristique"
                 value={row.key}
                 onChange={(e) => setSpecField(index, 'key', e.target.value)}
               />
               <input
                 className="input"
-                placeholder="Value"
+                placeholder="Valeur"
                 value={row.value}
                 onChange={(e) => setSpecField(index, 'value', e.target.value)}
               />
@@ -239,7 +268,7 @@ export default function ProductForm({
                 onClick={() => setSpecRows((prev) => prev.filter((_, i) => i !== index))}
                 disabled={specRows.length === 1}
               >
-                Remove
+                Retirer
               </button>
             </div>
           ))}
@@ -248,13 +277,13 @@ export default function ProductForm({
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-slate-800">Product Images</h3>
+          <h3 className="text-sm font-semibold text-slate-800">Images du produit</h3>
           <button
             type="button"
             className="btn-secondary"
             onClick={() => setImageRows((prev) => [...prev, { url: '', alt: '', order: prev.length }])}
           >
-            Add
+            Ajouter
           </button>
         </div>
         <div className="space-y-2">
@@ -263,13 +292,13 @@ export default function ProductForm({
               <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
                 <input
                   className="input"
-                  placeholder="Image URL"
+                  placeholder="URL de l'image"
                   value={row.url}
                   onChange={(e) => setImageField(index, 'url', e.target.value)}
                 />
                 <input
                   className="input"
-                  placeholder="Alt text"
+                  placeholder="Texte alternatif"
                   value={row.alt}
                   onChange={(e) => setImageField(index, 'alt', e.target.value)}
                 />
@@ -277,7 +306,7 @@ export default function ProductForm({
                   <input
                     className="input"
                     type="number"
-                    placeholder="Order"
+                    placeholder="Ordre"
                     value={row.order}
                     onChange={(e) => setImageField(index, 'order', e.target.value)}
                   />
@@ -287,7 +316,7 @@ export default function ProductForm({
                     onClick={() => setImageRows((prev) => prev.filter((_, i) => i !== index))}
                     disabled={imageRows.length === 1}
                   >
-                    Remove
+                    Retirer
                   </button>
                 </div>
               </div>
@@ -299,10 +328,10 @@ export default function ProductForm({
 
       <div className="grid grid-cols-1 gap-2 sm:flex sm:justify-end">
         <button type="button" className="btn-secondary w-full sm:w-auto" onClick={onCancel} disabled={busy}>
-          Cancel
+          Annuler
         </button>
         <button type="submit" className="btn-primary w-full sm:w-auto" disabled={busy}>
-          {busy ? 'Saving...' : submitLabel}
+          {busy ? 'Enregistrement...' : submitLabel}
         </button>
       </div>
     </form>

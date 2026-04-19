@@ -4,6 +4,10 @@ const testEntries = [
   {
     key: 'testsUnit.smokePages',
     file: 'src/pages/pages.smoke.test.jsx'
+  },
+  {
+    key: 'testsUnit.orderHistory',
+    file: 'src/utils/orderHistory.test.js'
   }
 ];
 

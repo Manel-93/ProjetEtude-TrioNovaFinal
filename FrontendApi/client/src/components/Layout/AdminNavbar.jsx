@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Boxes, Images, LayoutDashboard, ListOrdered, Mail, TrendingUp, Users, Settings } from 'lucide-react';
+import { Boxes, Images, LayoutDashboard, ListOrdered, Mail, TrendingUp, Users, Settings, MessageCircle } from 'lucide-react';
 
 const links = [
   { to: '/admin/dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
@@ -8,9 +8,11 @@ const links = [
   { to: '/admin/products', label: 'Produits', icon: Boxes },
   { to: '/admin/top-products', label: 'Top', icon: TrendingUp },
   { to: '/admin/orders', label: 'Commandes', icon: ListOrdered },
+  { to: '/admin/billing', label: 'Facturation', icon: Mail },
   { to: '/admin/users', label: 'Utilisateurs', icon: Users },
   { to: '/admin/settings', label: 'Paramètres', icon: Settings },
-  { to: '/admin/messages', label: 'Messages', icon: Mail }
+  { to: '/admin/messages', label: 'Messages', icon: Mail },
+  { to: '/admin/chatbot-logs', label: 'Chatbot', icon: MessageCircle }
 ];
 
 export default function AdminNavbar() {

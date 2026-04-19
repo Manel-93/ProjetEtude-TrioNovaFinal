@@ -1,8 +1,18 @@
 import { emailTransporter, emailFrom } from '../config/email.js';
 
 export class EmailService {
+  getStorefrontUrl(baseUrl) {
+    return (
+      process.env.STOREFRONT_URL ||
+      process.env.FRONTEND_URL ||
+      process.env.CLIENT_URL ||
+      baseUrl
+    ).replace(/\/$/, '');
+  }
+
   async sendEmailConfirmation(email, token, baseUrl) {
-    const confirmUrl = `${baseUrl}/auth/confirm-email?token=${token}`;
+    const storefrontUrl = this.getStorefrontUrl(baseUrl);
+    const confirmUrl = `${storefrontUrl}/connexion?confirmation=${encodeURIComponent(token)}`;
     
     const mailOptions = {
       from: emailFrom,
@@ -28,7 +38,8 @@ export class EmailService {
   }
 
   async sendPasswordReset(email, token, baseUrl) {
-    const resetUrl = `${baseUrl}/auth/reset-password?token=${token}`;
+    const storefrontUrl = this.getStorefrontUrl(baseUrl);
+    const resetUrl = `${storefrontUrl}/reinitialiser-mot-de-passe?token=${encodeURIComponent(token)}`;
     
     const mailOptions = {
       from: emailFrom,

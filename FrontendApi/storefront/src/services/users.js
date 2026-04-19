@@ -16,6 +16,8 @@ export const setDefaultAddress = (id) => api.patch(`/users/me/addresses/${id}/de
 
 export const getPaymentMethods = () => api.get('/users/me/payment-methods');
 
+export const createPaymentMethod = (body) => api.post('/users/me/payment-methods', body);
+
 export const deletePaymentMethod = (id) => api.delete(`/users/me/payment-methods/${id}`);
 
 export const setDefaultPaymentMethod = (id) =>

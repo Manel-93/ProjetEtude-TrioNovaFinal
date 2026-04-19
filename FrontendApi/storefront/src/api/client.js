@@ -3,15 +3,30 @@ import axios from 'axios';
 const LS_ACCESS = 'althe_access_token';
 const LS_REFRESH = 'althe_refresh_token';
 const LS_GUEST = 'althe_guest_token';
+const LS_REMEMBER = 'althe_remember_me';
 
 export const storage = {
-  getAccess: () => localStorage.getItem(LS_ACCESS),
-  setAccess: (t) => localStorage.setItem(LS_ACCESS, t),
-  getRefresh: () => localStorage.getItem(LS_REFRESH),
-  setRefresh: (t) => localStorage.setItem(LS_REFRESH, t),
+  getAccess: () => localStorage.getItem(LS_ACCESS) || sessionStorage.getItem(LS_ACCESS),
+  setAccess: (t, remember = localStorage.getItem(LS_REMEMBER) === 'true') => {
+    const target = remember ? localStorage : sessionStorage;
+    const other = remember ? sessionStorage : localStorage;
+    target.setItem(LS_ACCESS, t);
+    other.removeItem(LS_ACCESS);
+  },
+  getRefresh: () => localStorage.getItem(LS_REFRESH) || sessionStorage.getItem(LS_REFRESH),
+  setRefresh: (t, remember = localStorage.getItem(LS_REMEMBER) === 'true') => {
+    const target = remember ? localStorage : sessionStorage;
+    const other = remember ? sessionStorage : localStorage;
+    target.setItem(LS_REFRESH, t);
+    other.removeItem(LS_REFRESH);
+  },
+  getRemember: () => localStorage.getItem(LS_REMEMBER) === 'true',
+  setRemember: (remember) => localStorage.setItem(LS_REMEMBER, String(Boolean(remember))),
   clearAuth: () => {
     localStorage.removeItem(LS_ACCESS);
     localStorage.removeItem(LS_REFRESH);
+    sessionStorage.removeItem(LS_ACCESS);
+    sessionStorage.removeItem(LS_REFRESH);
   },
   getGuest: () => localStorage.getItem(LS_GUEST),
   setGuest: (t) => localStorage.setItem(LS_GUEST, t),

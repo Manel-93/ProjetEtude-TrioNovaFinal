@@ -18,6 +18,7 @@ import SettingsPage from '../pages/Settings/SettingsPage';
 import ChatbotLogsPage from '../pages/Chatbot/ChatbotLogsPage';
 import TopProductsPage from '../pages/TopProducts/TopProductsPage';
 import HomeCarouselPage from '../pages/HomeCarousel/HomeCarouselPage';
+import BillingPage from '../pages/Billing/BillingPage';
 
 const router = createBrowserRouter([
   {
@@ -44,6 +45,7 @@ const router = createBrowserRouter([
           { path: 'categories', element: <CategoryListPage /> },
           { path: 'orders', element: <OrderListPage /> },
           { path: 'orders/:id', element: <OrderDetailPage /> },
+          { path: 'billing', element: <BillingPage /> },
           { path: 'messages', element: <ContactMessagesPage /> },
           { path: 'users', element: <UsersListPage /> },
           { path: 'settings', element: <SettingsPage /> },

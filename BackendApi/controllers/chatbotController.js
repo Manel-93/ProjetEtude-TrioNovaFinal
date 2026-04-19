@@ -8,7 +8,7 @@ export class ChatbotController {
   // Envoyer un message au chatbot
   sendMessage = async (req, res, next) => {
     try {
-      const { sessionId, message } = req.body;
+      const { sessionId, message, profile, context } = req.body;
 
       if (!message || typeof message !== 'string' || message.trim().length === 0) {
         return res.status(400).json({
@@ -25,6 +25,8 @@ export class ChatbotController {
         message: message.trim(),
         userId: req.user?.userId || null,
         metadata: {
+          profile: profile || null,
+          context: context || null,
           ipAddress: req.ip,
           userAgent: req.get('user-agent')
         }
@@ -38,6 +40,24 @@ export class ChatbotController {
           isEscalated: result.isEscalated,
           matchedFaq: result.matchedFaq
         }
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getConversations = async (req, res, next) => {
+    try {
+      const { status, page = 1, limit = 20 } = req.query;
+      const result = await this.chatbotService.getConversations(
+        { status },
+        { page, limit }
+      );
+
+      res.status(200).json({
+        success: true,
+        data: result.data,
+        pagination: result.pagination
       });
     } catch (error) {
       next(error);

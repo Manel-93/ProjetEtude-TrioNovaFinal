@@ -16,8 +16,24 @@ export class OrderController {
         });
       }
 
-      const { page = 1, limit = 20 } = req.query;
-      const result = await this.orderService.getUserOrders(userId, { page, limit });
+      const {
+        page = 1,
+        limit = 20,
+        search = '',
+        year,
+        productType = '',
+        state = ''
+      } = req.query;
+      const result = await this.orderService.getUserOrders(
+        userId,
+        {
+          search,
+          year,
+          productType,
+          state
+        },
+        { page, limit }
+      );
       
       res.status(200).json({
         success: true,
@@ -37,6 +53,20 @@ export class OrderController {
       
       const order = await this.orderService.getOrderById(parseInt(id), userId);
       
+      res.status(200).json({
+        success: true,
+        data: order
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  // Récupérer une commande par ID (admin)
+  getOrderByIdAdmin = async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const order = await this.orderService.getOrderById(parseInt(id, 10), null);
       res.status(200).json({
         success: true,
         data: order

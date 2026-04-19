@@ -251,9 +251,16 @@ export class UserService {
   }
 
   async createPaymentMethod(userId, paymentData) {
-    // Vérifier que le token Stripe est valide (à implémenter avec Stripe SDK si nécessaire)
+    const normalizedPaymentData = { ...paymentData };
+    if (!normalizedPaymentData.stripeCustomerId) {
+      normalizedPaymentData.stripeCustomerId = `manual_cus_${userId}`;
+    }
+    if (!normalizedPaymentData.stripePaymentMethodId) {
+      normalizedPaymentData.stripePaymentMethodId = `manual_pm_${userId}_${Date.now()}`;
+    }
+
     const paymentMethod = await this.paymentMethodRepository.create({
-      ...paymentData,
+      ...normalizedPaymentData,
       userId
     });
     

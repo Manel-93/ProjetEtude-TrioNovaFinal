@@ -60,6 +60,10 @@ const ChatbotConversationSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
+    contactProfile: {
+      type: Object,
+      default: null
+    },
     messages: {
       type: [ChatMessageSchema],
       default: []

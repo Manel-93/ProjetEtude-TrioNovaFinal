@@ -5,6 +5,8 @@ export const login = (email, password, guestToken) =>
 
 export const register = (payload) => api.post('/auth/register', payload);
 
+export const confirmEmail = (token) => api.post('/auth/confirm-email', { token });
+
 export const logout = (refreshToken) => api.post('/auth/logout', { refreshToken });
 
 export const forgotPassword = (email) => api.post('/auth/forgot-password', { email });

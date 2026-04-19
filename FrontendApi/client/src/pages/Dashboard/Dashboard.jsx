@@ -1,9 +1,18 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import api from '../../services/api';
-import SalesChart from '../../components/charts/SalesChart';
-import BasketChart from '../../components/charts/BasketChart';
-import CategoryPieChart from '../../components/charts/CategoryPieChart';
+import { Bar, Pie } from 'react-chartjs-2';
+import {
+  ArcElement,
+  BarElement,
+  CategoryScale,
+  Chart as ChartJS,
+  Legend,
+  LinearScale,
+  Tooltip
+} from 'chart.js';
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
 
 function StatCard({ title, value, accent }) {
   return (
@@ -16,8 +25,6 @@ function StatCard({ title, value, accent }) {
 
 export default function Dashboard() {
   const [error, setError] = useState('');
-  const [salesPeriod, setSalesPeriod] = useState('7d');
-  const [basketPeriod, setBasketPeriod] = useState('7d');
 
   const {
     data,
@@ -38,48 +45,70 @@ export default function Dashboard() {
   if (loading) return <div className="card p-6">Loading dashboard...</div>;
   if (error) return <div className="card border-red-200 p-6 text-red-600">{error}</div>;
 
-  const sales7d = data?.sales?.last7Days || data?.salesLast7Days || [];
-  const sales5w = data?.sales?.last5Weeks || data?.salesLast5Weeks || [];
+  const categoryDistribution = data?.salesByCategory || [];
+  const sales7Days = data?.salesLast7Days || [];
+  const kpis = data?.kpis || {};
 
-  const basket7d = data?.basket?.byCategory7Days || data?.basketByCategory7Days || [];
-  const basket5w = data?.basket?.byCategory5Weeks || data?.basketByCategory5Weeks || [];
-
-  const categoryDistribution = data?.salesByCategory || data?.categoryDistribution || [];
+  const pieData = {
+    labels: categoryDistribution.map((entry) => entry.categoryName || 'Sans categorie'),
+    datasets: [
+      {
+        data: categoryDistribution.map((entry) => Number(entry.totalRevenue || 0)),
+        backgroundColor: ['#14b8a6', '#60a5fa', '#f59e0b', '#a78bfa', '#34d399', '#f87171']
+      }
+    ]
+  };
+  const barData = {
+    labels: sales7Days.map((entry) => entry.label),
+    datasets: [
+      {
+        label: 'Ventes EUR',
+        data: sales7Days.map((entry) => Number(entry.value || 0)),
+        backgroundColor: '#38bdf8'
+      }
+    ]
+  };
 
   return (
     <section className="space-y-5">
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
-          title="Total Sales"
-          value={`EUR ${Number(data?.totalRevenue || 0).toFixed(2)}`}
+          title="CA mensuel"
+          value={`EUR ${Number(kpis.revenue || 0).toFixed(2)}`}
           accent="text-emerald-600"
         />
-        <StatCard title="Total Orders" value={data?.totalOrders || 0} accent="text-sky-600" />
+        <StatCard title="Commandes" value={kpis.orders || 0} accent="text-sky-600" />
         <StatCard
-          title="Average Basket"
-          value={`EUR ${Number(data?.averageBasket || 0).toFixed(2)}`}
-          accent="text-indigo-600"
+          title="Alertes stock"
+          value={kpis.stockAlerts || 0}
+          accent="text-amber-600"
         />
-        <StatCard title="Total Products" value={data?.totalProducts || 0} accent="text-amber-600" />
+        <StatCard title="Messages non traites" value={kpis.unresolvedMessages || 0} accent="text-rose-600" />
       </div>
 
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)]">
-        <SalesChart
-          data7d={sales7d}
-          data5w={sales5w}
-          period={salesPeriod}
-          onChangePeriod={setSalesPeriod}
-        />
-        <CategoryPieChart data={categoryDistribution} />
-      </div>
+        <section className="card p-4 sm:p-6">
+          <h2 className="text-base font-semibold text-slate-900 sm:text-lg">Histogramme des ventes - 7 jours</h2>
+          <p className="mt-1 text-xs text-slate-500 sm:text-sm">Evolution quotidienne du chiffre d'affaires.</p>
+          <div className="mt-4 h-72">
+            <Bar
+              data={barData}
+              options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } }
+              }}
+            />
+          </div>
+        </section>
 
-      <div className="grid grid-cols-1 gap-5">
-        <BasketChart
-          data7d={basket7d}
-          data5w={basket5w}
-          period={basketPeriod}
-          onChangePeriod={setBasketPeriod}
-        />
+        <section className="card p-4 sm:p-6">
+          <h2 className="text-base font-semibold text-slate-900 sm:text-lg">Repartition ventes par categorie</h2>
+          <p className="mt-1 text-xs text-slate-500 sm:text-sm">Graphique camembert des ventes en EUR.</p>
+          <div className="mt-4 h-72">
+            <Pie data={pieData} options={{ responsive: true, maintainAspectRatio: false }} />
+          </div>
+        </section>
       </div>
     </section>
   );

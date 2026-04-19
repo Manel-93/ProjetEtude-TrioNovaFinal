@@ -206,6 +206,12 @@ export default function UsersListPage() {
                 </td>
                 <td className="px-4 py-3 text-sm text-right">
                   <div className="flex flex-wrap items-center justify-end gap-2">
+                    <a
+                      href={`mailto:${encodeURIComponent(u.email)}`}
+                      className="inline-flex items-center rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                    >
+                      Envoyer un mail
+                    </a>
                     <Button
                       variant="secondary"
                       disabled={rowBusyId === u.id}

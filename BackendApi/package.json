@@ -9,6 +9,7 @@
     "dev": "nodemon server.js",
     "update:medical-images": "node scripts/updateMedicalProductImages.js",
     "remove:tensiometre-bras": "node scripts/deleteTensiometreBrasProduct.js",
+    "catalog:keep-three": "node scripts/pruneCatalogKeepThreeProducts.js",
     "update:category-images": "node scripts/updateCategoryImages.js"
   },
   "keywords": [
@@ -31,6 +32,7 @@
     "joi": "^17.11.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.21.0",
+    "multer": "^2.1.1",
     "mysql2": "^3.6.5",
     "nodemailer": "^6.9.7",
     "stripe": "^14.10.0",

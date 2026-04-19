@@ -20,7 +20,7 @@ export default function ProductEdit() {
         setInitialValues(productRes.data.data || null);
         setCategories(categoriesRes.data.data || []);
       })
-      .catch((err) => setError(err?.response?.data?.error?.message || 'Failed to load product.'))
+      .catch((err) => setError(err?.response?.data?.error?.message || 'Impossible de charger le produit.'))
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -30,23 +30,23 @@ export default function ProductEdit() {
     setSubmitting(true);
     try {
       await updateProduct(id, payload);
-      setSuccess('Product updated successfully.');
+      setSuccess('Produit mis à jour avec succès.');
     } catch (err) {
-      setError(err?.response?.data?.error?.message || 'Failed to update product.');
+      setError(err?.response?.data?.error?.message || 'Impossible de mettre à jour le produit.');
       throw err;
     } finally {
       setSubmitting(false);
     }
   };
 
-  if (loading) return <div className="card p-6">Loading product...</div>;
+  if (loading) return <div className="card p-6">Chargement du produit...</div>;
   if (error) return <div className="card border-red-200 p-6 text-red-600">{error}</div>;
-  if (!initialValues) return <div className="card p-6">Product not found.</div>;
+  if (!initialValues) return <div className="card p-6">Produit introuvable.</div>;
 
   return (
     <section className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold">Edit Product</h2>
+        <h2 className="text-xl font-bold">Modifier le produit</h2>
         <button
           type="button"
           onClick={() => navigate('/admin/products')}
@@ -59,7 +59,7 @@ export default function ProductEdit() {
       <ProductForm
         initialValues={initialValues}
         categories={categories}
-        submitLabel="Save"
+        submitLabel="Enregistrer"
         onSubmit={handleSubmit}
         onCancel={() => navigate('/admin/products')}
         externalLoading={submitting}

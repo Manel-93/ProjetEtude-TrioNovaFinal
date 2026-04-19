@@ -18,6 +18,7 @@ export default function AdminLayout() {
     if (location.pathname.startsWith('/admin/home-carousel')) return 'Carrousel accueil';
     if (location.pathname.startsWith('/admin/categories')) return 'Catégories';
     if (location.pathname.startsWith('/admin/orders')) return 'Commandes';
+    if (location.pathname.startsWith('/admin/billing')) return 'Facturation';
     if (location.pathname.startsWith('/admin/messages')) return 'Messages';
     if (location.pathname.startsWith('/admin/users')) return 'Utilisateurs';
     if (location.pathname.startsWith('/admin/settings')) return 'Paramètre';

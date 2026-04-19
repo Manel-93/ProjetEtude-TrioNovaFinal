@@ -12,19 +12,19 @@ export default function ProductDetails() {
     setLoading(true);
     getProductById(id)
       .then((res) => setProduct(res.data.data || null))
-      .catch((err) => setError(err?.response?.data?.error?.message || 'Failed to load product.'))
+      .catch((err) => setError(err?.response?.data?.error?.message || 'Impossible de charger le produit.'))
       .finally(() => setLoading(false));
   }, [id]);
 
-  if (loading) return <div className="card p-6">Loading product...</div>;
+  if (loading) return <div className="card p-6">Chargement du produit...</div>;
   if (error) return <div className="card border-red-200 p-6 text-red-600">{error}</div>;
-  if (!product) return <div className="card p-6">Product not found.</div>;
+  if (!product) return <div className="card p-6">Produit introuvable.</div>;
 
   return (
     <section className="space-y-4">
       <div className="flex items-center justify-between">
-        <Link className="btn-secondary" to="/admin/products">Back</Link>
-        <Link className="btn-primary" to={`/admin/products/${id}/edit`}>Edit</Link>
+        <Link className="btn-secondary" to="/admin/products">Retour</Link>
+        <Link className="btn-primary" to={`/admin/products/${id}/edit`}>Modifier</Link>
       </div>
 
       <article className="card p-5 sm:p-6">
@@ -34,13 +34,13 @@ export default function ProductDetails() {
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <p><span className="font-semibold">ID:</span> {product.id}</p>
           <p><span className="font-semibold">Slug:</span> {product.slug}</p>
-          <p><span className="font-semibold">Price HT:</span> EUR {Number(product.priceHt || 0).toFixed(2)}</p>
-          <p><span className="font-semibold">Price TTC:</span> EUR {Number(product.priceTtc || 0).toFixed(2)}</p>
-          <p><span className="font-semibold">TVA:</span> {product.tva}%</p>
-          <p><span className="font-semibold">Stock:</span> {product.stock}</p>
-          <p><span className="font-semibold">Priority:</span> {product.priority}</p>
-          <p><span className="font-semibold">Status:</span> {product.status}</p>
-          <p><span className="font-semibold">Category ID:</span> {product.categoryId ?? '-'}</p>
+          <p><span className="font-semibold">Prix HT :</span> EUR {Number(product.priceHt || 0).toFixed(2)}</p>
+          <p><span className="font-semibold">Prix TTC :</span> EUR {Number(product.priceTtc || 0).toFixed(2)}</p>
+          <p><span className="font-semibold">TVA :</span> {product.tva}%</p>
+          <p><span className="font-semibold">Stock :</span> {product.stock}</p>
+          <p><span className="font-semibold">Priorité :</span> {product.priority}</p>
+          <p><span className="font-semibold">Statut :</span> {product.status}</p>
+          <p><span className="font-semibold">ID catégorie :</span> {product.categoryId ?? '-'}</p>
         </div>
       </article>
     </section>

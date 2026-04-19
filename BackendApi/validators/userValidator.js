@@ -108,17 +108,17 @@ export const updateAddressSchema = Joi.object({
 });
 
 export const paymentMethodSchema = Joi.object({
-  stripeCustomerId: Joi.string().required().messages({
-    'any.required': 'L\'ID client Stripe est requis'
-  }),
-  stripePaymentMethodId: Joi.string().required().messages({
-    'any.required': 'L\'ID méthode de paiement Stripe est requis'
-  }),
+  stripeCustomerId: Joi.string().allow('', null).optional(),
+  stripePaymentMethodId: Joi.string().allow('', null).optional(),
   type: Joi.string().valid('card', 'bank_account').default('card').optional(),
-  last4: Joi.string().length(4).optional(),
-  brand: Joi.string().optional(),
+  last4: Joi.string().pattern(/^\d{4}$/).optional().messages({
+    'string.pattern.base': 'Les 4 derniers chiffres doivent être numériques'
+  }),
+  brand: Joi.string().allow('', null).optional(),
   expiryMonth: Joi.number().min(1).max(12).optional(),
   expiryYear: Joi.number().min(new Date().getFullYear()).optional()
+}).or('stripePaymentMethodId', 'last4').messages({
+  'object.missing': 'Un moyen de paiement Stripe ou les 4 derniers chiffres sont requis'
 });
 
 export const updateUserStatusSchema = Joi.object({

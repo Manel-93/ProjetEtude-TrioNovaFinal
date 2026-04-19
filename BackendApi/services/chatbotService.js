@@ -298,6 +298,16 @@ export class ChatbotService {
 
   async handleMessage({ sessionId, message, userId = null, metadata = {} }) {
     const conversation = await this.getOrCreateConversation(sessionId, userId);
+    const profile = metadata?.profile || null;
+
+    if (profile && (profile.name || profile.email || profile.phone)) {
+      conversation.contactProfile = {
+        ...(conversation.contactProfile || {}),
+        ...(profile.name ? { name: String(profile.name).trim() } : {}),
+        ...(profile.email ? { email: String(profile.email).trim().toLowerCase() } : {}),
+        ...(profile.phone ? { phone: String(profile.phone).trim() } : {})
+      };
+    }
 
     conversation.messages.push({
       sender: 'user',
@@ -360,6 +370,45 @@ export class ChatbotService {
       reply: botReply,
       isEscalated: isEscalation,
       matchedFaq: null
+    };
+  }
+
+  async getConversations(filters = {}, pagination = {}) {
+    const page = parseInt(pagination.page || 1, 10);
+    const limit = parseInt(pagination.limit || 20, 10);
+    const skip = (page - 1) * limit;
+    const query = {};
+
+    if (filters.status) query.status = filters.status;
+
+    const [rows, total] = await Promise.all([
+      ChatbotConversationModel.find(query)
+        .sort({ updatedAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      ChatbotConversationModel.countDocuments(query)
+    ]);
+
+    return {
+      data: rows.map((row) => ({
+        id: row._id,
+        sessionId: row.sessionId,
+        userId: row.userId,
+        status: row.status,
+        isEscalated: row.isEscalated,
+        contactProfile: row.contactProfile || null,
+        lastMessage: row.messages?.length ? row.messages[row.messages.length - 1] : null,
+        messageCount: row.messages?.length || 0,
+        createdAt: row.createdAt,
+        updatedAt: row.updatedAt
+      })),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit)
+      }
     };
   }
 }

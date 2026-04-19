@@ -27,6 +27,9 @@ export const loginSchema = Joi.object({
   }),
   password: Joi.string().required().messages({
     'any.required': 'Le mot de passe est requis'
+  }),
+  twoFactorToken: Joi.string().pattern(/^[0-9]{6}$/).optional().messages({
+    'string.pattern.base': 'Le code 2FA doit contenir 6 chiffres'
   })
 });
 

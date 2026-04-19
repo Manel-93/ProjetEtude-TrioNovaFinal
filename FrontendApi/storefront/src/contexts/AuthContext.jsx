@@ -46,12 +46,13 @@ export function AuthProvider({ children }) {
   }, [refreshProfile]);
 
   const login = useCallback(
-    async (email, password) => {
+    async (email, password, rememberMe = false) => {
       const guestToken = storage.getGuest();
       const res = await loginApi(email, password, guestToken);
       const { accessToken, refreshToken } = res.data.data;
-      storage.setAccess(accessToken);
-      storage.setRefresh(refreshToken);
+      storage.setRemember(rememberMe);
+      storage.setAccess(accessToken, rememberMe);
+      storage.setRefresh(refreshToken, rememberMe);
       const mapped = await refreshProfile();
       return mapped;
     },

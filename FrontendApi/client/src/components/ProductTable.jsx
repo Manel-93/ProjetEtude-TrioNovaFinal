@@ -46,7 +46,13 @@ export default function ProductTable({
                 <SortHeader label="Nom" column="name" sortBy={sortBy} sortDir={sortDir} onSort={onSort} />
               </th>
               <th className="px-3 py-3 sm:px-4">
-                <SortHeader label="Prix" column="price" sortBy={sortBy} sortDir={sortDir} onSort={onSort} />
+                <SortHeader label="Prix HT" column="priceHt" sortBy={sortBy} sortDir={sortDir} onSort={onSort} />
+              </th>
+              <th className="px-3 py-3 sm:px-4">
+                <SortHeader label="TVA" column="tva" sortBy={sortBy} sortDir={sortDir} onSort={onSort} />
+              </th>
+              <th className="px-3 py-3 sm:px-4">
+                <SortHeader label="Prix TTC" column="priceTtc" sortBy={sortBy} sortDir={sortDir} onSort={onSort} />
               </th>
               <th className="px-3 py-3 sm:px-4">
                 <SortHeader label="Catégorie" column="category" sortBy={sortBy} sortDir={sortDir} onSort={onSort} />

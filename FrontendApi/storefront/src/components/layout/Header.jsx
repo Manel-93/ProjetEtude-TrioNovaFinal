@@ -168,7 +168,7 @@ export default function Header() {
           <NavLink to="/recherche" className={navClass} onClick={() => setOpen(false)}>
             {t('nav.catalog')}
           </NavLink>
-          <NavLink to="/contact" className={navClass} onClick={() => setOpen(false)}>
+          <NavLink to="/outils" className={navClass} onClick={() => setOpen(false)}>
             {t('nav.contact')}
           </NavLink>
           {user ? (

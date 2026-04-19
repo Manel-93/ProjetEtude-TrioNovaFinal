@@ -13,8 +13,8 @@ export function AuthProvider({ children }) {
     }
   });
 
-  const login = useCallback(async (email, password) => {
-    const res = await loginApi(email, password);
+  const login = useCallback(async (email, password, twoFactorToken) => {
+    const res = await loginApi(email, password, twoFactorToken);
     const { accessToken, refreshToken, user: userData } = res.data.data;
     localStorage.setItem('admin_access_token', accessToken);
     localStorage.setItem('admin_refresh_token', refreshToken);

@@ -7,7 +7,8 @@ import {
   Images,
   Mail,
   Users,
-  Settings
+  Settings,
+  MessageCircle
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { redirectToStorefrontLogin } from '../../utils/storefrontUrl';
@@ -19,9 +20,11 @@ const links = [
   { to: '/admin/products', label: 'Produits', icon: Boxes },
   { to: '/admin/top-products', label: 'Top produits', icon: TrendingUp },
   { to: '/admin/orders', label: 'Commandes', icon: ListOrdered },
+  { to: '/admin/billing', label: 'Facturation', icon: Mail },
   { to: '/admin/users', label: 'Utilisateurs', icon: Users },
   { to: '/admin/settings', label: 'Paramètres', icon: Settings },
-  { to: '/admin/messages', label: 'Messages', icon: Mail }
+  { to: '/admin/messages', label: 'Messages', icon: Mail },
+  { to: '/admin/chatbot-logs', label: 'Chatbot', icon: MessageCircle }
 ];
 
 function SidebarLink({ to, label, icon: Icon, onNavigate }) {

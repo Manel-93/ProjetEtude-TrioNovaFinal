@@ -1,6 +1,8 @@
 import { UserRepository } from '../repositories/userRepository.js';
 import { TokenRepository } from '../repositories/tokenRepository.js';
 import { LoginHistoryRepository } from '../repositories/loginHistoryRepository.js';
+import { Admin2FARepository } from '../repositories/admin2faRepository.js';
+import { Admin2FAService } from './admin2faService.js';
 import { PasswordService } from './passwordService.js';
 import { JwtService } from './jwtService.js';
 import { EmailService } from './emailService.js';
@@ -10,6 +12,8 @@ export class AuthService {
     this.userRepository = new UserRepository();
     this.tokenRepository = new TokenRepository();
     this.loginHistoryRepository = new LoginHistoryRepository();
+    this.admin2faRepository = new Admin2FARepository();
+    this.admin2faService = new Admin2FAService();
     this.passwordService = new PasswordService();
     this.jwtService = new JwtService();
     this.emailService = new EmailService();
@@ -86,7 +90,7 @@ export class AuthService {
     return { message: 'Email confirmé avec succès' };
   }
 
-  async login(email, password, ipAddress = null, userAgent = null, guestToken = null) {
+  async login(email, password, ipAddress = null, userAgent = null, guestToken = null, twoFactorToken = null) {
     // Trouver l'utilisateur
     const user = await this.userRepository.findByEmail(email);
     
@@ -125,6 +129,23 @@ export class AuthService {
     if (!user.is_active) {
       await logLogin(false, 'Compte désactivé');
       throw new Error('Compte désactivé');
+    }
+
+    if (user.role === 'ADMIN') {
+      const admin2fa = await this.admin2faRepository.findByUserId(user.id);
+      if (admin2fa?.isEnabled) {
+        if (!twoFactorToken) {
+          await logLogin(false, 'Code 2FA requis');
+          const error = new Error('Code 2FA requis pour ce compte administrateur');
+          error.code = '2FA_REQUIRED';
+          throw error;
+        }
+        const is2faValid = await this.admin2faService.verifyToken(user.id, String(twoFactorToken));
+        if (!is2faValid) {
+          await logLogin(false, 'Code 2FA invalide');
+          throw new Error('Code 2FA invalide');
+        }
+      }
     }
 
     // Générer les tokens

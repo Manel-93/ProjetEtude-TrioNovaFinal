@@ -24,6 +24,7 @@ export default function Login() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [twoFactorToken, setTwoFactorToken] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -39,7 +40,7 @@ export default function Login() {
 
     setLoading(true);
     try {
-      await login(email.trim(), password);
+      await login(email.trim(), password, twoFactorToken.trim() || undefined);
       const meRes = await getMe();
       const profile = meRes.data.data;
       const role = profile?.role;
@@ -143,6 +144,23 @@ export default function Login() {
                   )}
                 </button>
               </div>
+            </div>
+
+            <div>
+              <label htmlFor="twoFactorToken" className="mb-1.5 block text-sm font-medium text-slate-700">
+                Code 2FA (si activé)
+              </label>
+              <input
+                id="twoFactorToken"
+                type="text"
+                inputMode="numeric"
+                maxLength={6}
+                className="input"
+                placeholder="123456"
+                value={twoFactorToken}
+                onChange={(e) => setTwoFactorToken(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                disabled={loading}
+              />
             </div>
 
             {/* Submit */}

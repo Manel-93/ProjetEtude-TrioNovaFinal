@@ -93,7 +93,7 @@
   },
   "auth": {
     "loginTitle": "Connexion",
-    "loginSubtitle": "Espace client ; les comptes administrateur sont redirigés vers le panneau d’administration",
+    "loginSubtitle": "Espace client",
     "registerTitle": "Inscription",
     "email": "Email",
     "password": "Mot de passe",
@@ -102,6 +102,12 @@
     "submitLogin": "Se connecter",
     "submitRegister": "Créer mon compte",
     "forgot": "Mot de passe oublié ?",
+    "rememberMe": "Se souvenir de moi",
+    "invalidCredentialsRequired": "Email et mot de passe requis.",
+    "wrongPasswordHint": "Mot de passe incorrect ?",
+    "resetPasswordLink": "Réinitialiser mon mot de passe",
+    "confirmingAccount": "Confirmation de votre compte en cours...",
+    "confirmSuccess": "Votre inscription est confirmée. Vous pouvez maintenant vous connecter.",
     "resetTitle": "Nouveau mot de passe",
     "adminRedirect": "Vous êtes administrateur : utilisez le panneau administrateur.",
     "showPassword": "Afficher le mot de passe"
@@ -126,7 +132,15 @@
     "fetchError": "Impossible de charger vos moyens de paiement.",
     "emptyTitle": "Aucun moyen de paiement enregistré.",
     "emptyDescription": "Vos futures cartes apparaîtront ici après votre premier paiement validé.",
-    "emptyHint": "Astuce : finalisez une commande par carte pour l'enregistrer automatiquement sur votre compte."
+    "emptyHint": "Astuce : finalisez une commande par carte pour l'enregistrer automatiquement sur votre compte.",
+    "addTitle": "Ajouter une carte bancaire",
+    "addDescription": "Renseignez uniquement les informations nécessaires pour l'affichage sécurisé.",
+    "brandLabel": "Type de carte",
+    "last4Label": "4 derniers chiffres",
+    "expiryMonthLabel": "Mois d'expiration",
+    "expiryYearLabel": "Année d'expiration",
+    "addButton": "Ajouter la carte",
+    "last4Invalid": "Veuillez saisir exactement 4 chiffres."
   },
   "testsUnit": {
     "title": "Tests unitaires",
@@ -135,6 +149,10 @@
     "smokePages": {
       "title": "Smoke tests des pages",
       "description": "Rend chaque page principale de manière isolée pour valider qu'aucun crash ne survient au montage."
+    },
+    "orderHistory": {
+      "title": "Historique de commandes",
+      "description": "Valide le regroupement antéchronologique, les badges de statut et les formats affichés dans l'espace client."
     }
   },
   "orders": {

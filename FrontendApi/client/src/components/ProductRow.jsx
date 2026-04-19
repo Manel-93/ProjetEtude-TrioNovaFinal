@@ -18,6 +18,8 @@ export default function ProductRow({ product, selected, onToggle, onRequestDelet
           <span className="min-w-0 truncate whitespace-nowrap">{product.name}</span>
         </div>
       </td>
+      <td className="whitespace-nowrap px-3 py-3 text-sm text-slate-700 sm:px-4">EUR {Number(product.priceHt || 0).toFixed(2)}</td>
+      <td className="whitespace-nowrap px-3 py-3 text-sm text-slate-700 sm:px-4">{Number(product.tva || 0).toFixed(2)} %</td>
       <td className="whitespace-nowrap px-3 py-3 text-sm text-slate-700 sm:px-4">EUR {Number(product.priceTtc || 0).toFixed(2)}</td>
       <td className="whitespace-nowrap px-3 py-3 text-sm text-slate-600 sm:px-4">{product.categoryId ?? '-'}</td>
       <td className="whitespace-nowrap px-3 py-3 text-sm text-slate-700 sm:px-4">{product.stock}</td>

@@ -1,8 +1,13 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { getPaymentMethods, deletePaymentMethod, setDefaultPaymentMethod } from '../services/users';
+import {
+  createPaymentMethod,
+  getPaymentMethods,
+  deletePaymentMethod,
+  setDefaultPaymentMethod
+} from '../services/users';
 import { useAuth } from '../contexts/AuthContext';
 import { getApiError } from '../utils/errors';
 
@@ -17,6 +22,13 @@ export default function AccountPaymentsPage() {
   const { t } = useTranslation();
   const qc = useQueryClient();
   const { user, refreshProfile } = useAuth();
+  const [newCard, setNewCard] = useState({
+    brand: '',
+    last4: '',
+    expiryMonth: '',
+    expiryYear: ''
+  });
+  const [createError, setCreateError] = useState('');
 
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['payment-methods'],
@@ -31,6 +43,19 @@ export default function AccountPaymentsPage() {
     onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: ['payment-methods'] });
       await refreshProfile?.();
+    }
+  });
+
+  const createMut = useMutation({
+    mutationFn: (payload) => createPaymentMethod(payload),
+    onSuccess: async () => {
+      setCreateError('');
+      setNewCard({ brand: '', last4: '', expiryMonth: '', expiryYear: '' });
+      await qc.invalidateQueries({ queryKey: ['payment-methods'] });
+      await refreshProfile?.();
+    },
+    onError: (err) => {
+      setCreateError(getApiError(err));
     }
   });
 
@@ -58,10 +83,26 @@ export default function AccountPaymentsPage() {
     return { brand, last, exp };
   };
 
+  const submitNewCard = (e) => {
+    e.preventDefault();
+    setCreateError('');
+    const payload = {
+      type: 'card',
+      brand: newCard.brand.trim() || 'Carte',
+      last4: newCard.last4.trim(),
+      expiryMonth: newCard.expiryMonth ? Number(newCard.expiryMonth) : undefined,
+      expiryYear: newCard.expiryYear ? Number(newCard.expiryYear) : undefined
+    };
+    if (!/^\d{4}$/.test(payload.last4)) {
+      setCreateError(t('accountPayments.last4Invalid'));
+      return;
+    }
+    createMut.mutate(payload);
+  };
+
   return (
     <div>
       <h1 className="text-2xl font-bold text-slate-900">{t('account.payments')}</h1>
-      <p className="mt-2 text-sm text-slate-600">{t('accountPayments.subtitle')}</p>
 
       {isError ? (
         <div className="card mt-4 space-y-2 p-4 text-sm text-red-700">
@@ -118,6 +159,65 @@ export default function AccountPaymentsPage() {
           );
         })}
       </ul>
+
+      <section className="card mt-5 p-4">
+        <h2 className="text-base font-semibold text-slate-900">{t('accountPayments.addTitle')}</h2>
+        <p className="mt-1 text-sm text-slate-600">{t('accountPayments.addDescription')}</p>
+        <form onSubmit={submitNewCard} className="mt-4 grid gap-3 sm:grid-cols-2">
+          <label className="text-sm text-slate-700">
+            <span className="mb-1 block">{t('accountPayments.brandLabel')}</span>
+            <input
+              className="input"
+              value={newCard.brand}
+              onChange={(e) => setNewCard((prev) => ({ ...prev, brand: e.target.value }))}
+              placeholder="Visa"
+            />
+          </label>
+          <label className="text-sm text-slate-700">
+            <span className="mb-1 block">{t('accountPayments.last4Label')}</span>
+            <input
+              className="input"
+              inputMode="numeric"
+              maxLength={4}
+              value={newCard.last4}
+              onChange={(e) =>
+                setNewCard((prev) => ({ ...prev, last4: e.target.value.replace(/\D/g, '').slice(0, 4) }))
+              }
+              placeholder="4242"
+              required
+            />
+          </label>
+          <label className="text-sm text-slate-700">
+            <span className="mb-1 block">{t('accountPayments.expiryMonthLabel')}</span>
+            <input
+              className="input"
+              type="number"
+              min="1"
+              max="12"
+              value={newCard.expiryMonth}
+              onChange={(e) => setNewCard((prev) => ({ ...prev, expiryMonth: e.target.value }))}
+              placeholder="12"
+            />
+          </label>
+          <label className="text-sm text-slate-700">
+            <span className="mb-1 block">{t('accountPayments.expiryYearLabel')}</span>
+            <input
+              className="input"
+              type="number"
+              min={new Date().getFullYear()}
+              value={newCard.expiryYear}
+              onChange={(e) => setNewCard((prev) => ({ ...prev, expiryYear: e.target.value }))}
+              placeholder={String(new Date().getFullYear() + 2)}
+            />
+          </label>
+          <div className="sm:col-span-2 flex items-center gap-3">
+            <button type="submit" className="btn-primary" disabled={createMut.isPending}>
+              {createMut.isPending ? t('common.loading') : t('accountPayments.addButton')}
+            </button>
+            {createError ? <p className="text-sm text-red-600">{createError}</p> : null}
+          </div>
+        </form>
+      </section>
 
       {methods.length === 0 && !isLoading ? (
         <div className="card mt-4 space-y-3 p-4 text-sm">

@@ -36,4 +36,19 @@ export class HomeCarouselController {
       next(error);
     }
   };
+
+  uploadImages = async (req, res, next) => {
+    try {
+      const files = req.files || [];
+      const data = files.map((file) => ({
+        filename: file.filename,
+        url: `/uploads/home-carousel/${file.filename}`,
+        size: file.size,
+        mimetype: file.mimetype
+      }));
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  };
 }
