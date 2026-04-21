@@ -6,13 +6,14 @@ import { ProductRepository } from '../repositories/productRepository.js';
 const BASE_SYSTEM_PROMPT = `Tu es l'assistant virtuel d'AltheaSystems, boutique en ligne d'équipements médicaux.
 Réponds en français avec un ton professionnel, simple et utile.
 Tu peux conseiller des produits en t'appuyant sur le catalogue fourni ci-dessous (prix TTC, descriptions), expliquer livraison/retour et orienter vers la page Contact en cas de besoin.
-Ne donne pas de diagnostic médical personnalisé et ne fabrique pas d'informations de commande (numéro, statut d'expédition, etc.) : dans ce cas, renvoie vers la page Contact.`;
+Ne donne pas de diagnostic médical personnalisé et ne fabrique pas d'informations de commande (numéro, statut d'expédition, etc.) : dans ce cas, renvoie vers la page Contact.
+N'utilise pas de markdown ni d'astérisques dans tes réponses : texte brut uniquement (pas de ** ni de * pour mettre en valeur).`;
 
 const DEFAULT_MISTRAL_MODEL = 'mistral-small-latest';
 
 const SUPPORT_CONTACT =
   'L’assistant automatique est momentanément indisponible. Pour une aide personnalisée sur nos produits ou votre commande, ' +
-  'merci d’utiliser la page **Contact** du site ou d’écrire à **altheasystems@outlook.fr**.';
+  'merci d’utiliser la page Contact du site ou d’écrire à altheasystems@outlook.fr.';
 
 const STOP_WORDS = new Set([
   'le',
@@ -61,8 +62,10 @@ const STOP_WORDS = new Set([
   'how'
 ]);
 
-const OFFLINE_ANSWERS = [
+const OFFLINE_FAQ = [
   {
+    id: 'tensiometre',
+    questionLabel: 'Tensiomètre / tension artérielle',
     test: (m) =>
       /tensio|tension\s*art|pression\s*art|brassard|sphygmo/i.test(m),
     answer:
@@ -72,6 +75,8 @@ const OFFLINE_ANSWERS = [
       'doit être faite par un professionnel de santé. Pour un achat ou une question de commande, utilisez la page Contact du site.'
   },
   {
+    id: 'stethoscope',
+    questionLabel: 'Stéthoscope',
     test: (m) => /st[hé]?é?thoscope|stethoscope|stetho|auscult/i.test(m),
     answer:
       'Un stéthoscope professionnel sert à écouter les sons du corps (cœur, poumons, vaisseaux, etc.) lors d’un examen. ' +
@@ -79,13 +84,58 @@ const OFFLINE_ANSWERS = [
       'Pour le choix d’un modèle ou une commande, vous pouvez consulter notre catalogue ou nous écrire via la page Contact.'
   },
   {
+    id: 'thermometre',
+    questionLabel: 'Thermomètre infrarouge',
     test: (m) => /thermom|infrarouge|temp[eé]rature/i.test(m),
     answer:
       'Un thermomètre infrarouge mesure la température à distance (souvent au front ou à l’oreille selon le modèle), sans contact prolongé. ' +
       'Il est pratique pour un dépistage rapide ; en cas de fièvre ou de doute, consultez un professionnel de santé. ' +
       'Pour une question sur nos produits, utilisez la page Contact.'
+  },
+  {
+    id: 'masques',
+    questionLabel: 'Masques / protection respiratoire',
+    test: (m) => /masque|ffp2|ffp3|chirurgical|respirat/i.test(m),
+    answer:
+      'Les masques médicaux ou FFP servent à réduire la transmission de gouttelettes ou d’aérosols selon la norme du modèle. ' +
+      'Le choix dépend du contexte (soins, industrie, grand public) : consultez la fiche produit ou un professionnel pour un usage en milieu de soins. ' +
+      'Pour une commande ou une disponibilité, passez par le catalogue ou la page Contact.'
+  },
+  {
+    id: 'gants',
+    questionLabel: 'Gants jetables',
+    test: (m) => /gant|nitrile|latex|vinyle/i.test(m),
+    answer:
+      'Les gants jetables (nitrile, latex, vinyle) protègent lors de soins ou de manutention. ' +
+      'Ils ne remplacent pas les mesures d’hygiène complètes ; choisissez la taille et la norme adaptées à votre usage. ' +
+      'Pour les références en stock, consultez notre boutique ou écrivez-nous via Contact.'
   }
 ];
+
+const HUMAN_HANDOFF_REPLY =
+  'Très bien. Votre demande est marquée pour un conseiller humain. ' +
+  'Indiquez votre nom et votre email dans le bandeau du chat puis utilisez le formulaire « Envoyer au support » pour détailler votre besoin : notre équipe le recevra dans le back-office avec l’historique de cette conversation.';
+
+function matchOfflineFaq(message) {
+  for (const entry of OFFLINE_FAQ) {
+    if (entry.test(message)) {
+      return {
+        id: entry.id,
+        questionLabel: entry.questionLabel,
+        answer: entry.answer
+      };
+    }
+  }
+  return null;
+}
+
+function userRequestsHumanAssistance(text) {
+  const m = String(text || '').trim();
+  if (!m) return false;
+  return /\b(conseill(e|ère|er)|humain|agent|op[eé]rateur|t[eé]l[eé]phone|appeler|rappelez|support\s*humain|parler\s+[\u00e0a]\s+quelqu['’]?un|vrai\s+personne|personne\s+physique)\b/i.test(
+    m
+  );
+}
 
 function normalizeMistralModelName(raw) {
   let s = String(raw ?? '').trim();
@@ -121,6 +171,17 @@ function truncateText(s, max) {
   return `${t.slice(0, max - 1)}…`;
 }
 
+/** Retire le markdown type **gras** / *italique* pour l’affichage client. */
+function stripChatMarkdownForClient(text) {
+  let s = String(text || '');
+  while (/\*\*[^*]+\*\*/.test(s)) {
+    s = s.replace(/\*\*([^*]+)\*\*/g, '$1');
+  }
+  s = s.replace(/\*([^*\n]+)\*/g, '$1');
+  s = s.replace(/\*{1,2}/g, '');
+  return s.trim();
+}
+
 function formatCatalogBlock(products) {
   if (!products?.length) {
     return '(Aucun produit actif dans le catalogue pour le moment.)';
@@ -130,7 +191,7 @@ function formatCatalogBlock(products) {
       const price = Number(p.priceTtc).toFixed(2);
       const desc = truncateText(p.description, 200);
       const stock = Number(p.stock) > 0 ? 'en stock' : 'rupture / sur demande';
-      return `- **${p.name}** | Prix TTC : ${price} € | Slug : ${p.slug} | ${stock}\n  Description : ${desc}`;
+      return `- ${p.name} | Prix TTC : ${price} € | Slug : ${p.slug} | ${stock}\n  Description : ${desc}`;
     })
     .join('\n');
 }
@@ -159,12 +220,6 @@ function buildMistralMessages({ messages, userText, systemContent }) {
   return out;
 }
 
-function offlineReplyForMessage(message) {
-  for (const entry of OFFLINE_ANSWERS) {
-    if (entry.test(message)) return entry.answer;
-  }
-  return null;
-}
 
 function friendlyMistralError(err) {
   const msg = String(err?.message || err || '');
@@ -243,7 +298,7 @@ function formatLocalProductReply(products) {
     const desc = truncateText(p.description, 400);
     const stock = Number(p.stock) > 0 ? 'En stock' : 'Rupture de stock (pour l’instant)';
     return (
-      `**${p.name}**\n` +
+      `${p.name}\n` +
       `- Prix TTC : ${price} €\n` +
       `- ${stock}\n` +
       `- Description : ${desc}\n` +
@@ -315,17 +370,24 @@ export class ChatbotService {
       metadata
     });
 
-    const localReply = await this.tryLocalProductAnswer(message);
-    const faqReply = offlineReplyForMessage(message);
+    const wantsHuman = userRequestsHumanAssistance(message);
+    const faqHit = wantsHuman ? null : matchOfflineFaq(message);
+    const localReply = faqHit ? null : await this.tryLocalProductAnswer(message);
     const useMistral = this.useMistralApi();
 
     let botReply;
+    let matchedFaq = null;
     let mistralFailed = false;
 
-    try {
-      if (!useMistral) {
-        botReply = localReply || faqReply || SUPPORT_CONTACT;
-      } else {
+    if (wantsHuman) {
+      botReply = HUMAN_HANDOFF_REPLY;
+    } else if (faqHit) {
+      botReply = faqHit.answer;
+      matchedFaq = { id: faqHit.id, question: faqHit.questionLabel };
+    } else if (localReply) {
+      botReply = localReply;
+    } else if (useMistral) {
+      try {
         const catalogResult = await this.productRepository.findAll(
           { status: 'active' },
           { page: 1, limit: 80 },
@@ -338,16 +400,21 @@ export class ChatbotService {
           systemContent
         });
         botReply = await generateWithMistral(mistralMessages);
+      } catch (err) {
+        mistralFailed = true;
+        console.error('[chatbot] Mistral error', err?.statusCode ?? err?.code, err?.message);
+        botReply = friendlyMistralError(err);
       }
-    } catch (err) {
-      mistralFailed = useMistral;
-      console.error('[chatbot] Mistral error', err?.statusCode ?? err?.code, err?.message);
-      botReply = localReply || faqReply || friendlyMistralError(err);
+    } else {
+      botReply = SUPPORT_CONTACT;
     }
 
+    botReply = stripChatMarkdownForClient(botReply);
+
     const isEscalation =
+      wantsHuman ||
       botReply === SUPPORT_CONTACT ||
-      (mistralFailed && !localReply && !faqReply);
+      (mistralFailed && !localReply && !faqHit);
 
     if (isEscalation) {
       conversation.isEscalated = true;
@@ -358,8 +425,8 @@ export class ChatbotService {
       sender: 'bot',
       message: botReply,
       metadata,
-      faqMatchedQuestion: null,
-      faqMatchedAnswer: null,
+      faqMatchedQuestion: faqHit?.questionLabel || null,
+      faqMatchedAnswer: faqHit ? faqHit.answer : null,
       isEscalation
     });
 
@@ -369,8 +436,18 @@ export class ChatbotService {
       sessionId: conversation.sessionId,
       reply: botReply,
       isEscalated: isEscalation,
-      matchedFaq: null
+      matchedFaq
     };
+  }
+
+  async getConversationBySessionId(sessionId) {
+    const doc = await ChatbotConversationModel.findOne({ sessionId }).lean();
+    if (!doc) {
+      const err = new Error('Conversation introuvable');
+      err.statusCode = 404;
+      throw err;
+    }
+    return doc;
   }
 
   async getConversations(filters = {}, pagination = {}) {

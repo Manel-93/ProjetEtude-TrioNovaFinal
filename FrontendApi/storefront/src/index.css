@@ -6,11 +6,15 @@
   color-scheme: light;
 }
 
+#root {
+  min-height: 100vh;
+}
+
 body {
   margin: 0;
   font-family: 'Segoe UI', 'Trebuchet MS', sans-serif;
   color: #334155;
-  background: linear-gradient(165deg, #d4f4f7 0%, #ecfdf5 35%, #f8fafc 100%);
+  background: #f0fafb;
 }
 
 [dir='rtl'] .flip-rtl {

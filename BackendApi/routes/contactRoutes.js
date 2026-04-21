@@ -77,6 +77,12 @@ router.post('/contact', validate(createContactMessageSchema), contactMessageCont
 router.post('/chatbot/message', chatbotController.sendMessage);
 
 router.get('/admin/chatbot/conversations', authenticate, isAdmin, chatbotController.getConversations);
+router.get(
+  '/admin/chatbot/conversations/:sessionId',
+  authenticate,
+  isAdmin,
+  chatbotController.getConversationBySessionId
+);
 
 /**
  * @swagger

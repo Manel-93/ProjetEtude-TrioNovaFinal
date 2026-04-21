@@ -7,6 +7,26 @@ import { getCategoryCoverImageUrl } from '../utils/categoryImage';
 import ProductCard from '../components/ProductCard';
 import { getCategoryDisplayName, getCategoryDisplayDescription } from '../utils/categoryLocale';
 
+function normalizeProductName(name) {
+  return String(name || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '');
+}
+
+function isHiddenCatalogProduct(product) {
+  const n = normalizeProductName(product?.name);
+  if (!n) return false;
+
+  if ((n.includes('gant') || n.includes('gants')) && n.includes('nitrile') && n.includes('poudr')) {
+    return true;
+  }
+  if ((n.includes('gueridon') || n.includes('guerido')) && n.includes('inox')) return true;
+  if (n.includes('otoscope') && n.includes('fibre') && n.includes('optique')) return true;
+
+  return false;
+}
+
 export default function CategoryPage() {
   const { categoryId } = useParams();
   const { t, i18n } = useTranslation();
@@ -39,7 +59,18 @@ export default function CategoryPage() {
     }
   });
 
-  const products = list?.data || [];
+  const products = (list?.data || []).filter((p) => !isHiddenCatalogProduct(p));
+  if (import.meta.env.DEV) {
+    const nitrileProducts = (list?.data || []).filter((p) =>
+      normalizeProductName(p?.name).includes('nitrile')
+    );
+    if (nitrileProducts.length > 0) {
+      console.warn(
+        '[STOCK-DEBUG][CategoryPage][nitrile-list]',
+        nitrileProducts.map((p) => ({ id: p.id, name: p.name, stock: p.stock, slug: p.slug }))
+      );
+    }
+  }
   const cat = meta?.category;
   const catTitle = cat ? getCategoryDisplayName(cat, lang) : '';
   const catDesc = cat ? getCategoryDisplayDescription(cat, lang) : '';

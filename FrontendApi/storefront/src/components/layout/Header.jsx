@@ -84,20 +84,19 @@ export default function Header() {
           <label htmlFor="global-search" className="sr-only">
             {t('header.searchPlaceholder')}
           </label>
-          <div className="relative mx-auto w-full max-w-4xl">
-            <Search
-              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
-              aria-hidden
-            />
+          <div className="mx-auto w-full max-w-4xl">
+            <div className="flex items-center rounded-2xl border border-slate-300 bg-white px-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
+              <Search className="h-4 w-4 shrink-0 text-slate-400" aria-hidden />
             <input
               id="global-search"
               type="search"
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder={t('header.searchPlaceholder')}
-              className="input w-full py-2.5 pl-11 pr-3 sm:pl-12"
+              className="w-full border-0 bg-transparent py-2.5 pl-2 pr-1 text-base text-slate-700 outline-none placeholder:text-slate-400"
               autoComplete="off"
             />
+            </div>
           </div>
         </form>
 

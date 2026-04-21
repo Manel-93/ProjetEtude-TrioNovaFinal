@@ -6,6 +6,9 @@ function norm(s) {
 }
 
 function pickNameEn(n, fallback) {
+  if ((n.includes('equipement') || n.includes('equipements')) && n.includes('medic')) {
+    return 'Medical equipment';
+  }
   if (n.includes('imagerie') && n.includes('medic')) return 'Medical imaging';
   if (n.includes('mobilier') && n.includes('medic')) return 'Medical furniture';
   if ((n.includes('consommable') || n.includes('consommables')) && n.includes('medic')) {
@@ -17,6 +20,9 @@ function pickNameEn(n, fallback) {
 }
 
 function pickNameAr(n, fallback) {
+  if ((n.includes('equipement') || n.includes('equipements')) && n.includes('medic')) {
+    return 'معدات طبية';
+  }
   if (n.includes('imagerie') && n.includes('medic')) return 'التصوير الطبي';
   if (n.includes('mobilier') && n.includes('medic')) return 'الأثاث الطبي';
   if ((n.includes('consommable') || n.includes('consommables')) && n.includes('medic')) {
@@ -28,6 +34,9 @@ function pickNameAr(n, fallback) {
 }
 
 function pickDescEn(n, fallback) {
+  if (n.includes('tous') && n.includes('equipement') && n.includes('medic') && n.includes('professionnel')) {
+    return 'All professional medical equipment.';
+  }
   if (n.includes('imagerie') && n.includes('medic')) {
     return 'Scanners, ultrasound, detectors and imaging accessories.';
   }

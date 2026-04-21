@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getCart, removeFromCart, updateCartItem } from '../services/cart';
 import { getApiError } from '../utils/errors';
 import { isInStock, getPrimaryImageUrl } from '../utils/product';
+import { getDefaultMedicalImageUrl, placeholderUrl } from '../utils/catalogFallbackImages';
 import { getProductDisplayName } from '../utils/productLocale';
 
 export default function CartPage() {
@@ -60,11 +61,24 @@ export default function CartPage() {
               const ok = isInStock(p);
               const img = getPrimaryImageUrl({ ...p, images: p.images || [] });
               const lineTitle = getProductDisplayName(p, i18n?.language || 'fr');
+              const fallbackImg = placeholderUrl(lineTitle || 'Product', 200, 200);
               return (
                 <li key={line.id} className="card flex flex-col gap-4 p-4 sm:flex-row sm:items-center">
                   <div className="h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-slate-100">
                     {img ? (
-                      <img src={img} alt="" className="h-full w-full object-cover" />
+                      <img
+                        src={img}
+                        alt=""
+                        className="h-full w-full object-cover"
+                        onError={(e) => {
+                          const next = e.currentTarget.src.includes('source.unsplash.com')
+                            ? getDefaultMedicalImageUrl()
+                            : fallbackImg;
+                          if (e.currentTarget.src !== next) {
+                            e.currentTarget.src = next;
+                          }
+                        }}
+                      />
                     ) : (
                       <div className="flex h-full items-center justify-center text-xs text-slate-400">—</div>
                     )}

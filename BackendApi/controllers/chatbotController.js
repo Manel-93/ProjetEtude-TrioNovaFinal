@@ -63,5 +63,19 @@ export class ChatbotController {
       next(error);
     }
   };
+
+  /** Détail MongoDB pour suivi back-office (fil de discussion complet). */
+  getConversationBySessionId = async (req, res, next) => {
+    try {
+      const { sessionId } = req.params;
+      const doc = await this.chatbotService.getConversationBySessionId(sessionId);
+      res.status(200).json({
+        success: true,
+        data: doc
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 

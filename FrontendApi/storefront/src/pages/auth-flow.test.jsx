@@ -120,7 +120,7 @@ describe("Flux d'authentification", () => {
     fireEvent.change(screen.getByLabelText('auth.password'), {
       target: { value: 'MotDePasse123!' }
     });
-    fireEvent.click(screen.getByLabelText('Se souvenir de moi'));
+    fireEvent.click(screen.getByRole('checkbox', { name: 'auth.rememberMe' }));
     fireEvent.click(screen.getByRole('button', { name: 'auth.submitLogin' }));
 
     await waitFor(() => {
@@ -152,9 +152,9 @@ describe("Flux d'authentification", () => {
     fireEvent.click(screen.getByRole('button', { name: 'auth.submitLogin' }));
 
     await waitFor(() => {
-      expect(screen.getByText('Mot de passe incorrect ?')).toBeTruthy();
+      expect(screen.getByText('auth.wrongPasswordHint')).toBeTruthy();
     });
 
-    expect(screen.getByRole('link', { name: 'Réinitialiser mon mot de passe' })).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'auth.resetPasswordLink' })).toBeTruthy();
   });
 });

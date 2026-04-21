@@ -10,7 +10,7 @@ import { getDefaultMedicalImageUrl, placeholderUrl } from '../utils/catalogFallb
 import { getCategoryCoverImageUrl } from '../utils/categoryImage';
 import { resolveMediaUrl } from '../utils/mediaUrl';
 import ProductCard from '../components/ProductCard';
-import { getProductDisplayName } from '../utils/productLocale';
+import { getProductDisplayDescription, getProductDisplayName } from '../utils/productLocale';
 import { getCategoryDisplayName, getCategoryDisplayDescription } from '../utils/categoryLocale';
 import { getCarouselSlideTitle, getCarouselSlideSubtitle } from '../utils/carouselLocale';
 
@@ -79,7 +79,7 @@ export default function HomePage() {
   const subtitle = current
     ? fromApi
       ? getCarouselSlideSubtitle(current, lang)
-      : current.description || ''
+      : getProductDisplayDescription(current, lang)
     : '';
 
   const linkHref = useMemo(() => {
@@ -176,7 +176,7 @@ export default function HomePage() {
                 type="button"
                 className="rounded-lg p-2 hover:bg-slate-100"
                 onClick={() => setI((v) => (v - 1 + slides.length) % slides.length)}
-                aria-label="Previous"
+                aria-label={t('home.carouselPrevious')}
               >
                 <ChevronLeft className="h-5 w-5" />
               </button>
@@ -185,7 +185,7 @@ export default function HomePage() {
                   <button
                     key={idx}
                     type="button"
-                    aria-label={`Slide ${idx + 1}`}
+                    aria-label={t('home.carouselSlide', { index: idx + 1 })}
                     className={`h-2 rounded-full ${idx === i ? 'w-6 bg-ocean' : 'w-2 bg-slate-300'}`}
                     onClick={() => setI(idx)}
                   />
@@ -195,7 +195,7 @@ export default function HomePage() {
                 type="button"
                 className="rounded-lg p-2 hover:bg-slate-100"
                 onClick={() => setI((v) => (v + 1) % slides.length)}
-                aria-label="Next"
+                aria-label={t('home.carouselNext')}
               >
                 <ChevronRight className="h-5 w-5" />
               </button>

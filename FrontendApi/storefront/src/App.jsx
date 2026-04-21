@@ -21,6 +21,7 @@ import AccountOrderDetailPage from './pages/AccountOrderDetailPage';
 import ContactPage from './pages/ContactPage';
 import AuthHandoffPage from './pages/AuthHandoffPage';
 import UnitTestsPage from './pages/UnitTestsPage';
+import { LegalNoticePage, PrivacyPolicyPage, TermsSalesPage } from './pages/LegalPages';
 
 export default function App() {
   return (
@@ -41,6 +42,9 @@ export default function App() {
         <Route path="/outils" element={<ContactPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/tests-unitaires" element={<UnitTestsPage />} />
+        <Route path="/mentions-legales" element={<LegalNoticePage />} />
+        <Route path="/politique-confidentialite" element={<PrivacyPolicyPage />} />
+        <Route path="/cgv" element={<TermsSalesPage />} />
 
         <Route
           path="/compte"

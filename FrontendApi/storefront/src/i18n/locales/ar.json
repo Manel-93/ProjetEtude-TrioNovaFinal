@@ -17,6 +17,9 @@
   },
   "footer": {
     "legal": "إشعار قانوني",
+    "legalNotice": "الإشعار القانوني",
+    "privacyPolicy": "سياسة الخصوصية (RGPD)",
+    "cgv": "الشروط العامة للبيع",
     "contact": "اتصل بنا",
     "social": "الشبكات الاجتماعية",
     "rights": "© {{year}} AltheaSystems",
@@ -24,6 +27,9 @@
   },
   "home": {
     "carousel": "مختارات",
+    "carouselPrevious": "الشريحة السابقة",
+    "carouselNext": "الشريحة التالية",
+    "carouselSlide": "الشريحة {{index}}",
     "categories": "الفئات",
     "topProducts": "الأكثر مبيعاً",
     "noProducts": "لا توجد منتجات حالياً."
@@ -32,6 +38,7 @@
     "price": "{{value}} € شامل الضريبة",
     "stock": "متوفر",
     "outOfStock": "نفد المخزون",
+    "insufficientStock": "مخزون غير كافٍ",
     "addToCart": "أضف إلى السلة",
     "unavailable": "غير متوفر",
     "specs": "المواصفات",
@@ -89,7 +96,12 @@
     "paymentNotReady": "نموذج الدفع لا يزال يُحمّل. انتظر قليلاً ثم أعد المحاولة.",
     "paymentProcessing": "جاري معالجة الدفع. سيتم إعادة التوجيه أو ستصلك رسالة تأكيد.",
     "paymentLoading": "جاري الاتصال بـ Stripe… يُفعّل زر الدفع عند جاهزية النموذج.",
-    "paymentLoadError": "تعذّر تحميل نموذج الدفع (الشبكة، مانع الإعلانات، أو مفتاح Stripe)."
+    "paymentLoadError": "تعذّر تحميل نموذج الدفع (الشبكة، مانع الإعلانات، أو مفتاح Stripe).",
+    "addressLine1": "العنوان",
+    "city": "المدينة",
+    "postalCode": "الرمز البريدي",
+    "country": "الدولة",
+    "guestAddressHint": "كمستخدم ضيف، يُستخدم هذا العنوان للعرض المحلي للتسليم؛ بينما تعتمد الطلبية على بيانات الدفع في الخادم."
   },
   "auth": {
     "loginTitle": "تسجيل الدخول",
@@ -102,6 +114,12 @@
     "submitLogin": "دخول",
     "submitRegister": "إنشاء الحساب",
     "forgot": "نسيت كلمة المرور؟",
+    "rememberMe": "تذكرني",
+    "invalidCredentialsRequired": "البريد الإلكتروني وكلمة المرور مطلوبان.",
+    "wrongPasswordHint": "كلمة المرور غير صحيحة؟",
+    "resetPasswordLink": "إعادة تعيين كلمة المرور",
+    "confirmingAccount": "جاري تأكيد حسابك...",
+    "confirmSuccess": "تم تأكيد تسجيلك. يمكنك الآن تسجيل الدخول.",
     "resetTitle": "كلمة مرور جديدة",
     "adminRedirect": "أنت مسؤول: استخدم لوحة الإدارة.",
     "showPassword": "إظهار كلمة المرور"
@@ -116,7 +134,7 @@
     "phone": "الهاتف"
   },
   "accountPayments": {
-    "subtitle": "البطاقات المحفوظة عبر Stripe (معرّفات ترجعها الواجهة البرمجية بعد الدفع).",
+    "subtitle": "البطاقات المحفوظة عبر Stripe (معرّفات ترجعها الواجهة البرمجية بعد دفع محفوظ).",
     "cardFallback": "بطاقة",
     "setDefault": "تعيين كافتراضي",
     "delete": "حذف",
@@ -126,7 +144,15 @@
     "fetchError": "تعذّر تحميل وسائل الدفع.",
     "emptyTitle": "لا توجد وسيلة دفع محفوظة بعد.",
     "emptyDescription": "ستظهر بطاقاتك هنا بعد أول عملية دفع ناجحة.",
-    "emptyHint": "نصيحة: أكمل عملية شراء بالدفع بالبطاقة ليتم حفظها تلقائيا في حسابك."
+    "emptyHint": "نصيحة: أكمل عملية شراء بالدفع بالبطاقة ليتم حفظها تلقائياً في حسابك.",
+    "addTitle": "إضافة بطاقة بنكية",
+    "addDescription": "أدخل فقط البيانات اللازمة للعرض الآمن.",
+    "brandLabel": "نوع البطاقة",
+    "last4Label": "آخر 4 أرقام",
+    "expiryMonthLabel": "شهر الانتهاء",
+    "expiryYearLabel": "سنة الانتهاء",
+    "addButton": "إضافة البطاقة",
+    "last4Invalid": "يرجى إدخال 4 أرقام بالضبط."
   },
   "testsUnit": {
     "title": "اختبارات الوحدة",
@@ -135,6 +161,10 @@
     "smokePages": {
       "title": "اختبارات smoke للصفحات",
       "description": "تقوم بعرض كل صفحة رئيسية بشكل معزول للتأكد من عدم حدوث تعطل عند التحميل."
+    },
+    "orderHistory": {
+      "title": "سجل الطلبات",
+      "description": "يتحقق من التجميع من الأحدث إلى الأقدم، شارات الحالة والتنسيقات في منطقة العميل."
     }
   },
   "orders": {
@@ -142,7 +172,7 @@
     "number": "الطلب",
     "date": "التاريخ",
     "status": "الحالة",
-    "total": "Total",
+    "total": "الإجمالي",
     "invoice": "فاتورة PDF",
     "empty": "لا توجد طلبات.",
     "byYear": "سنة {{year}}"
@@ -159,7 +189,43 @@
     "chatWelcome": "مرحبًا بك في AltheaSystems. أنا المساعد الذكي، كيف يمكنني مساعدتك اليوم؟",
     "chatOpen": "فتح الدردشة",
     "chatClose": "إغلاق الدردشة",
-    "chatSend": "إرسال الرسالة"
+    "chatSend": "إرسال الرسالة",
+    "toolsBadge": "أدوات",
+    "toolsTitle": "الاتصال والمساعدة والدردشة الآلية",
+    "toolsIntro": "استخدم النموذج الكامل للتواصل مع الدعم، أو تحدث مع المساعد للحصول على إجابة فورية قبل التصعيد إلى موظف عند الحاجة.",
+    "fullFormTitle": "نموذج الاتصال الكامل",
+    "chatSectionTitle": "دردشة آلية تفاعلية",
+    "chatSectionSubtitle": "إجابات فورية، جمع بيانات أساسية وتصعيد تلقائي إلى موظف عند الحاجة.",
+    "yourNamePlaceholder": "اسمك",
+    "yourEmailPlaceholder": "you@example.com",
+    "formSending": "جاري الإرسال…",
+    "chatTyping": "المساعد يكتب ردًا…",
+    "openDetailedForm": "فتح النموذج التفصيلي",
+    "escalationTitle": "تصعيد إلى موظف بشري",
+    "escalationDescription": "صف طلبك. سيتم حفظه في لوحة الإدارة مع سجل المحادثة.",
+    "supportSubjectPlaceholder": "موضوع الطلب",
+    "supportMessagePlaceholder": "اشرح احتياجك بالتفصيل",
+    "submitToSupport": "إرسال إلى الدعم",
+    "profileRequiredBeforeChat": "يرجى إدخال الاسم والبريد الإلكتروني قبل بدء المحادثة.",
+    "profileRequiredWidget": "يرجى إدخال الاسم والبريد الإلكتروني.",
+    "formSuccessMessage": "تم إرسال طلبك إلى الدعم.",
+    "escalationSuccessMessage": "تم تحويل طلبك إلى موظف بشري.",
+    "formErrorName": "الاسم مطلوب.",
+    "formErrorEmail": "بريد إلكتروني غير صالح.",
+    "formErrorSubject": "الموضوع مطلوب.",
+    "formErrorMessage": "الرسالة قصيرة جدًا.",
+    "floatingChatButton": "Contact Me",
+    "widgetEscalationHint": "تحتاج إلى موظف؟ أرسل طلبك.",
+    "widgetSupportSuccess": "تم إرسال طلبك إلى الدعم.",
+    "widgetSupportSubjectPlaceholder": "الموضوع",
+    "widgetSupportMessagePlaceholder": "صف احتياجك",
+    "widgetAiTyping": "الذكاء الاصطناعي يكتب…",
+    "widgetSendToSupport": "إرسال إلى الدعم",
+    "widgetEscalationSubjectDefault": "تصعيد الدردشة - طلب معقد",
+    "widgetPoweredByMistral": "Mistral AI وأسئلة شائعة طبية عامة",
+    "widgetEmailCaptureTitle": "بياناتك",
+    "widgetEmailCaptureSubtitle": "نستخدمها لتخصيص المحادثة ومتابعة الدعم (MongoDB ولوحة الإدارة).",
+    "widgetMedicalDisclaimer": "معلومات عامة عن المعدات الطبية فقط — ليست استشارة طبية شخصية. في الطوارئ اتصل بخدمات الطوارئ أو طبيبك."
   },
   "common": {
     "loading": "جاري التحميل…",

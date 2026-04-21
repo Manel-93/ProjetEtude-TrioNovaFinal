@@ -4,6 +4,7 @@ import Header from './Header';
 import Sidebar from './Sidebar';
 import PageContainer from './PageContainer';
 import AdminNavbar from './AdminNavbar';
+import Aurora from '../effects/Aurora';
 
 export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -26,10 +27,21 @@ export default function AdminLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-surface/50 text-slate-800">
+    <div className="admin-surface relative min-h-screen text-slate-800">
+      <div
+        className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
+        aria-hidden
+      >
+        <Aurora
+          colorStops={['#ffffff', '#06d2d4', '#ffffff']}
+          blend={0.5}
+          amplitude={1.0}
+          speed={1}
+        />
+      </div>
       <Sidebar open={sidebarOpen} onClose={closeSidebar} />
 
-      <div className="flex min-h-screen flex-col lg:pl-64">
+      <div className="relative z-10 flex min-h-screen flex-col lg:pl-64">
         <Header title={getTitle()} onToggleSidebar={toggleSidebar} />
         <AdminNavbar />
         <PageContainer>

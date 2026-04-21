@@ -6,8 +6,16 @@ import { storage } from '../api/client';
 import { useAuth } from '../contexts/AuthContext';
 import { confirmEmail } from '../services/auth';
 import { getApiError } from '../utils/errors';
+import BlurText from '../components/BlurText';
 
 const ADMIN_URL = import.meta.env.VITE_ADMIN_URL || 'http://localhost:3000';
+
+const handleBlurTitleComplete = () => {
+  if (import.meta.env.DEV) {
+    // eslint-disable-next-line no-console
+    console.log('Animation completed!');
+  }
+};
 
 export default function LoginPage() {
   const { t } = useTranslation();
@@ -98,6 +106,14 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
+        <BlurText
+          text="Althea Systems"
+          delay={200}
+          animateBy="words"
+          direction="top"
+          onAnimationComplete={handleBlurTitleComplete}
+          className="mb-8 w-full justify-center text-2xl font-bold tracking-tight text-ink"
+        />
         <div className="mb-8 text-center">
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-ink text-2xl font-bold text-white shadow-lg">
             A

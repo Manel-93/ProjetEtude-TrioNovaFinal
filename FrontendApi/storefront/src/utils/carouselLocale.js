@@ -8,6 +8,9 @@ function norm(s) {
 }
 
 function subtitleEn(n, raw) {
+  if (n.includes('tous') && n.includes('equipement') && n.includes('medic') && n.includes('professionnel')) {
+    return 'All professional medical equipment.';
+  }
   if (n.includes('thermometre') && (n.includes('infrarouge') || n.includes('sans contact'))) {
     return 'Fast, non-contact readings for screening and daily checks.';
   }
@@ -22,6 +25,9 @@ function subtitleEn(n, raw) {
   }
   if (n.includes('equipement') && n.includes('professionnel')) {
     return 'Professional-grade equipment for healthcare teams.';
+  }
+  if (n.includes('equipement') && n.includes('medic')) {
+    return 'Medical equipment for clinics, hospitals and daily care.';
   }
   if (n.includes('livraison') || n.includes('stock')) {
     return 'Quality medical supplies with reliable availability.';
@@ -44,6 +50,9 @@ function subtitleAr(n, raw) {
   }
   if (n.includes('equipement') && n.includes('professionnel')) {
     return 'معدات احترافية للفرق الصحية.';
+  }
+  if (n.includes('equipement') && n.includes('medic')) {
+    return 'معدات طبية للعيادات والمستشفيات والرعاية اليومية.';
   }
   return raw;
 }

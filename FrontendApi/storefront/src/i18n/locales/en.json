@@ -17,6 +17,9 @@
   },
   "footer": {
     "legal": "Legal notice",
+    "legalNotice": "Legal notice",
+    "privacyPolicy": "Privacy policy (GDPR)",
+    "cgv": "Terms of sale",
     "contact": "Contact",
     "social": "Social networks",
     "rights": "© {{year}} AltheaSystems",
@@ -24,6 +27,9 @@
   },
   "home": {
     "carousel": "Highlights",
+    "carouselPrevious": "Previous slide",
+    "carouselNext": "Next slide",
+    "carouselSlide": "Slide {{index}}",
     "categories": "Categories",
     "topProducts": "Top products",
     "noProducts": "No products yet."
@@ -32,6 +38,7 @@
     "price": "{{value}} € inc. VAT",
     "stock": "In stock",
     "outOfStock": "Out of stock",
+    "insufficientStock": "Insufficient stock",
     "addToCart": "Add to cart",
     "unavailable": "Unavailable",
     "specs": "Specifications",
@@ -89,7 +96,12 @@
     "paymentNotReady": "The payment form is still loading. Wait a moment and try again.",
     "paymentProcessing": "Payment is processing. You will be redirected or receive a confirmation email.",
     "paymentLoading": "Connecting to Stripe… The Pay button enables once the form is ready.",
-    "paymentLoadError": "Could not load the payment form (network, ad blocker, or Stripe key)."
+    "paymentLoadError": "Could not load the payment form (network, ad blocker, or Stripe key).",
+    "addressLine1": "Address",
+    "city": "City",
+    "postalCode": "Postal code",
+    "country": "Country",
+    "guestAddressHint": "As a guest, this address is used for local delivery display; the order uses payment-side data on the server."
   },
   "auth": {
     "loginTitle": "Sign in",
@@ -149,6 +161,10 @@
     "smokePages": {
       "title": "Page smoke tests",
       "description": "Renders every main page in isolation to ensure no crash occurs at mount."
+    },
+    "orderHistory": {
+      "title": "Order history",
+      "description": "Validates reverse-chronological grouping, status badges, and formats shown in the customer area."
     }
   },
   "orders": {
@@ -173,7 +189,43 @@
     "chatWelcome": "Hello and welcome to AltheaSystems. I am your assistant, how can I help you today?",
     "chatOpen": "Open chat",
     "chatClose": "Close chat",
-    "chatSend": "Send message"
+    "chatSend": "Send message",
+    "toolsBadge": "Tools",
+    "toolsTitle": "Contact, help and chatbot",
+    "toolsIntro": "Use the full form to reach support, or chat with our assistant for an immediate answer before optional escalation to a human agent.",
+    "fullFormTitle": "Full contact form",
+    "chatSectionTitle": "Interactive chatbot",
+    "chatSectionSubtitle": "Instant answers, basic details capture, and automatic escalation to an agent when needed.",
+    "yourNamePlaceholder": "Your name",
+    "yourEmailPlaceholder": "you@example.com",
+    "formSending": "Sending…",
+    "chatTyping": "The chatbot is writing a reply…",
+    "openDetailedForm": "Open the detailed form",
+    "escalationTitle": "Escalation to a human agent",
+    "escalationDescription": "Describe your request. It will be saved in the back office with the chat history.",
+    "supportSubjectPlaceholder": "Request subject",
+    "supportMessagePlaceholder": "Describe your need in detail",
+    "submitToSupport": "Send to support",
+    "profileRequiredBeforeChat": "Please enter your name and email before starting the conversation.",
+    "profileRequiredWidget": "Please enter your name and email.",
+    "formSuccessMessage": "Your request has been sent to support.",
+    "escalationSuccessMessage": "Your request has been forwarded to a human agent.",
+    "formErrorName": "Name is required.",
+    "formErrorEmail": "Invalid email.",
+    "formErrorSubject": "Subject is required.",
+    "formErrorMessage": "Message is too short.",
+    "floatingChatButton": "Contact Me",
+    "widgetEscalationHint": "Need a human agent? Send your request.",
+    "widgetSupportSuccess": "Your request has been sent to support.",
+    "widgetSupportSubjectPlaceholder": "Subject",
+    "widgetSupportMessagePlaceholder": "Describe your need",
+    "widgetAiTyping": "AI is typing…",
+    "widgetSendToSupport": "Send to support",
+    "widgetEscalationSubjectDefault": "Chatbot escalation - complex request",
+    "widgetPoweredByMistral": "Mistral AI answers & general medical FAQ",
+    "widgetEmailCaptureTitle": "Your details",
+    "widgetEmailCaptureSubtitle": "We use them to personalize the chat and support follow-up (MongoDB + back office).",
+    "widgetMedicalDisclaimer": "General information on medical equipment only — not personal medical advice. In an emergency, call emergency services or your doctor."
   },
   "common": {
     "loading": "Loading…",

@@ -5,7 +5,12 @@ import { BrowserRouter } from 'react-router-dom';
 import './i18n';
 import './index.css';
 import App from './App';
+import ChatWidget from './components/ChatWidget';
 import { AuthProvider } from './contexts/AuthContext';
+
+if (import.meta.env.DEV) {
+  console.info('[Althea] main.jsx chargé — le module ChatWidget sera monté avec l’app.');
+}
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,6 +30,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <BrowserRouter>
         <AuthProvider>
           <App />
+          <ChatWidget />
         </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>

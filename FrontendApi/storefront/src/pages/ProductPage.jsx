@@ -8,7 +8,7 @@ import { getApiError } from '../utils/errors';
 import { isInStock, buildProductGalleryImages, getPrimaryImageUrl } from '../utils/product';
 import ProductCard from '../components/ProductCard';
 import { resolveMediaUrl } from '../utils/mediaUrl';
-import { getProductDisplayName } from '../utils/productLocale';
+import { getProductDisplayDescription, getProductDisplayName } from '../utils/productLocale';
 import { getCategoryDisplayName } from '../utils/categoryLocale';
 
 export default function ProductPage() {
@@ -124,7 +124,9 @@ export default function ProductPage() {
           {msg ? <p className="mt-3 text-sm text-red-600">{msg}</p> : null}
 
           <div className="prose prose-slate mt-8 max-w-none">
-            <p className="whitespace-pre-wrap text-slate-700">{data.description}</p>
+            <p className="whitespace-pre-wrap text-slate-700">
+              {getProductDisplayDescription(data, i18n?.language || 'fr')}
+            </p>
           </div>
 
           {specs && Object.keys(specs).length > 0 ? (

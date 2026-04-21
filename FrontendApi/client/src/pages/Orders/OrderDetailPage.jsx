@@ -63,19 +63,6 @@ export default function OrderDetailPage() {
     }
   });
 
-  if (isLoading) return <div className="card p-6">Chargement de la commande...</div>;
-  if (isError)
-    return (
-      <div className="card border-red-200 p-6 text-red-600">
-        {error?.response?.data?.error?.message || 'Impossible de charger la commande.'}
-      </div>
-    );
-  if (!data) return <div className="card p-6">Commande introuvable.</div>;
-
-  const order = data;
-  const canCancel = ['pending', 'processing'].includes(String(order.status || '').toLowerCase());
-  const canFinalize = ['pending', 'processing'].includes(String(order.status || '').toLowerCase());
-
   const cancelMutation = useMutation({
     mutationFn: () =>
       updateOrderStatus(id, {
@@ -99,6 +86,19 @@ export default function OrderDetailPage() {
       await queryClient.invalidateQueries({ queryKey: ['orders'] });
     }
   });
+
+  if (isLoading) return <div className="card p-6">Chargement de la commande...</div>;
+  if (isError)
+    return (
+      <div className="card border-red-200 p-6 text-red-600">
+        {error?.response?.data?.error?.message || 'Impossible de charger la commande.'}
+      </div>
+    );
+  if (!data) return <div className="card p-6">Commande introuvable.</div>;
+
+  const order = data;
+  const canCancel = ['pending', 'processing'].includes(String(order.status || '').toLowerCase());
+  const canFinalize = ['pending', 'processing'].includes(String(order.status || '').toLowerCase());
 
   return (
     <section className="space-y-4">

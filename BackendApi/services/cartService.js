@@ -1,12 +1,24 @@
 import { CartRepository } from '../repositories/cartRepository.js';
 import { ProductRepository } from '../repositories/productRepository.js';
+import { ProductImageRepository } from '../repositories/productImageRepository.js';
 import { isProductExcludedFromStorefront } from '../utils/storefrontProductExclusions.js';
 import crypto from 'crypto';
+
+function mapMongoProductImage(img) {
+  if (!img?.url) return null;
+  return {
+    id: img._id != null ? String(img._id) : undefined,
+    url: img.url,
+    order: img.order ?? 0,
+    isPrimary: Boolean(img.isPrimary)
+  };
+}
 
 export class CartService {
   constructor() {
     this.cartRepository = new CartRepository();
     this.productRepository = new ProductRepository();
+    this.productImageRepository = new ProductImageRepository();
   }
 
   // Générer un token invité unique
@@ -33,7 +45,21 @@ export class CartService {
     }
 
     const items = await this.cartRepository.getCartItems(cart.id);
-    
+
+    const productIds = [...new Set(items.map((i) => i.productId).filter(Boolean))];
+    const mongoImages = productIds.length
+      ? await this.productImageRepository.findByProductIds(productIds)
+      : [];
+    const imagesByProductId = new Map();
+    for (const raw of mongoImages) {
+      const mapped = mapMongoProductImage(raw);
+      if (!mapped) continue;
+      const pid = Number(raw.productId);
+      if (!Number.isFinite(pid)) continue;
+      if (!imagesByProductId.has(pid)) imagesByProductId.set(pid, []);
+      imagesByProductId.get(pid).push(mapped);
+    }
+
     // Récupérer les détails des produits
     const itemsWithProducts = await Promise.all(
       items.map(async (item) => {
@@ -46,6 +72,7 @@ export class CartService {
         const itemPrice = product.priceTtc * item.quantity;
         const itemPriceHt = product.priceHt * item.quantity;
         const itemTva = itemPrice - itemPriceHt;
+        const images = imagesByProductId.get(Number(product.id)) || [];
 
         return {
           id: item.id,
@@ -58,7 +85,8 @@ export class CartService {
             priceTtc: product.priceTtc,
             tva: product.tva,
             stock: product.stock,
-            status: product.status
+            status: product.status,
+            images
           },
           quantity: item.quantity,
           subtotal: itemPriceHt,

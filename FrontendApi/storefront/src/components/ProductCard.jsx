@@ -9,6 +9,24 @@ export default function ProductCard({ product, listMode = false }) {
   const title = getProductDisplayName(product, i18n?.language || 'fr');
   const img = getPrimaryImageUrl(product) || getDefaultMedicalImageUrl();
   const stockOk = isInStock(product);
+  const normalizedName = String(product?.name || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '');
+
+  if (import.meta.env.DEV && normalizedName.includes('gant') && normalizedName.includes('nitrile')) {
+    console.warn('[STOCK-DEBUG][Catalog][ProductCard]', {
+      id: product?.id,
+      name: product?.name,
+      stock: product?.stock,
+      stockQuantity: product?.stockQuantity,
+      quantity: product?.quantity,
+      availableStock: product?.availableStock,
+      inventoryStock: product?.inventory?.stock,
+      stockOk
+    });
+  }
+
   const price = Number(product.priceTtc ?? product.price_ttc ?? 0).toFixed(2);
   const fallbackFinal = placeholderUrl('Medical Equipment', 600, 600);
 

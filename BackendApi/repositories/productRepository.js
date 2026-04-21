@@ -261,6 +261,21 @@ export class ProductRepository {
     return this.findById(productId);
   }
 
+  /**
+   * Diminue le stock après commande validée (quantité vendue).
+   * @returns {boolean} true si au moins une ligne a été mise à jour
+   */
+  async decrementStock(productId, quantity) {
+    const q = Math.max(0, parseInt(String(quantity), 10) || 0);
+    if (q <= 0) return true;
+    const pool = await getMySQLConnection();
+    const [result] = await pool.execute(
+      'UPDATE products SET stock = stock - ? WHERE id = ? AND stock >= ?',
+      [q, productId, q]
+    );
+    return result.affectedRows > 0;
+  }
+
   mapRowToObject(row) {
     return {
       id: row.id,

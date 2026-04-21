@@ -3,13 +3,14 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { sendContact, sendChatbotMessage } from '../services/contact';
 import { getApiError } from '../utils/errors';
+import { stripChatMarkdown } from '../utils/stripChatMarkdown';
 
-function validateForm(values) {
+function validateForm(values, t) {
   const errors = {};
-  if (!values.name.trim() || values.name.trim().length < 2) errors.name = 'Nom requis.';
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email.trim())) errors.email = 'Email invalide.';
-  if (!values.subject.trim() || values.subject.trim().length < 3) errors.subject = 'Sujet requis.';
-  if (!values.message.trim() || values.message.trim().length < 10) errors.message = 'Message trop court.';
+  if (!values.name.trim() || values.name.trim().length < 2) errors.name = t('contact.formErrorName');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email.trim())) errors.email = t('contact.formErrorEmail');
+  if (!values.subject.trim() || values.subject.trim().length < 3) errors.subject = t('contact.formErrorSubject');
+  if (!values.message.trim() || values.message.trim().length < 10) errors.message = t('contact.formErrorMessage');
   return errors;
 }
 
@@ -24,12 +25,7 @@ export default function ContactPage() {
   const [chatProfile, setChatProfile] = useState({ name: '', email: '' });
   const [chatSession, setChatSession] = useState('');
   const [chatInput, setChatInput] = useState('');
-  const [chatLines, setChatLines] = useState([
-    {
-      role: 'bot',
-      text: "Bonjour, je peux répondre aux questions fréquentes et vous orienter vers notre support si besoin."
-    }
-  ]);
+  const [chatLines, setChatLines] = useState([{ role: 'bot', text: t('contact.chatWelcome') }]);
   const [chatLoading, setChatLoading] = useState(false);
   const [chatEscalated, setChatEscalated] = useState(false);
   const [supportForm, setSupportForm] = useState({ subject: '', message: '' });
@@ -43,7 +39,7 @@ export default function ContactPage() {
 
   const submitContact = async (e) => {
     e.preventDefault();
-    const errors = validateForm(form);
+    const errors = validateForm(form, t);
     setFormErrors(errors);
     setErr('');
     setMsg('');
@@ -56,7 +52,7 @@ export default function ContactPage() {
         category: 'contact_form',
         context: { page: 'outils' }
       });
-      setMsg('Votre demande a bien été envoyée au backoffice support.');
+      setMsg(t('contact.formSuccessMessage'));
       setForm({ name: '', email: '', subject: '', message: '' });
       setFormErrors({});
     } catch (e2) {
@@ -71,7 +67,7 @@ export default function ContactPage() {
     const text = chatInput.trim();
     if (!text || chatLoading) return;
     if (!chatProfile.name.trim() || !chatProfile.email.trim()) {
-      setSupportErr('Renseignez votre nom et votre email avant de démarrer la conversation.');
+      setSupportErr(t('contact.profileRequiredBeforeChat'));
       return;
     }
 
@@ -90,11 +86,11 @@ export default function ContactPage() {
       setChatEscalated(Boolean(d.isEscalated));
       if (d.isEscalated && !supportForm.subject) {
         setSupportForm({
-          subject: 'Escalade chatbot - demande complexe',
+          subject: t('contact.widgetEscalationSubjectDefault'),
           message: `Conversation chatbot (${d.sessionId || 'nouvelle session'}) : ${text}`
         });
       }
-      setChatLines((c) => [...c, { role: 'bot', text: d.reply, escalated: d.isEscalated }]);
+      setChatLines((c) => [...c, { role: 'bot', text: d.reply || '', escalated: d.isEscalated }]);
     } catch (e2) {
       setChatLines((c) => [...c, { role: 'bot', text: getApiError(e2) }]);
     } finally {
@@ -117,7 +113,7 @@ export default function ContactPage() {
         category: 'chatbot_support',
         context: { page: 'outils' }
       });
-      setSupportMsg('Votre demande a été transmise à un agent humain dans le backoffice.');
+      setSupportMsg(t('contact.escalationSuccessMessage'));
     } catch (e2) {
       setSupportErr(getApiError(e2));
     }
@@ -126,18 +122,15 @@ export default function ContactPage() {
   return (
     <div className="mx-auto max-w-6xl space-y-8">
       <header className="space-y-2">
-        <p className="text-sm font-semibold uppercase tracking-[0.25em] text-ocean">Outils</p>
-        <h1 className="text-3xl font-bold text-slate-900">Contact, assistance et chatbot</h1>
-        <p className="max-w-3xl text-slate-600">
-          Utilisez le formulaire détaillé pour joindre le support, ou discutez avec notre assistant pour obtenir une
-          réponse immédiate avant une éventuelle escalade vers un agent humain.
-        </p>
+        <p className="text-sm font-semibold uppercase tracking-[0.25em] text-ocean">{t('contact.toolsBadge')}</p>
+        <h1 className="text-3xl font-bold text-slate-900">{t('contact.toolsTitle')}</h1>
+        <p className="max-w-3xl text-slate-600">{t('contact.toolsIntro')}</p>
       </header>
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1.05fr),minmax(0,0.95fr)]">
         <section id="support-form" className="card space-y-5 p-6">
           <div>
-            <h2 className="text-xl font-semibold text-slate-900">Formulaire de contact complet</h2>
+            <h2 className="text-xl font-semibold text-slate-900">{t('contact.fullFormTitle')}</h2>
           </div>
 
           <form onSubmit={submitContact} className="space-y-4" noValidate>
@@ -181,37 +174,35 @@ export default function ContactPage() {
               {formErrors.message ? <p className="mt-1 text-xs text-red-600">{formErrors.message}</p> : null}
             </div>
             <button type="submit" className="btn-primary" disabled={loading}>
-              {loading ? 'Envoi...' : t('contact.send')}
+              {loading ? t('contact.formSending') : t('contact.send')}
             </button>
           </form>
         </section>
 
         <section className="card flex h-[760px] flex-col p-6">
           <div className="mb-4">
-            <h2 className="text-xl font-semibold text-slate-900">Chatbot interactif</h2>
-            <p className="mt-1 text-sm text-slate-500">
-              Réponses instantanées, capture des informations de base et escalade automatique vers un agent si besoin.
-            </p>
+            <h2 className="text-xl font-semibold text-slate-900">{t('contact.chatSectionTitle')}</h2>
+            <p className="mt-1 text-sm text-slate-500">{t('contact.chatSectionSubtitle')}</p>
           </div>
 
           <div className="grid gap-3 rounded-2xl bg-slate-50 p-4 sm:grid-cols-2">
             <label className="text-sm">
-              <span className="mb-1 block font-medium text-slate-700">Nom</span>
+              <span className="mb-1 block font-medium text-slate-700">{t('contact.name')}</span>
               <input
                 className="input"
                 value={chatProfile.name}
                 onChange={(e) => setChatProfile((p) => ({ ...p, name: e.target.value }))}
-                placeholder="Votre nom"
+                placeholder={t('contact.yourNamePlaceholder')}
               />
             </label>
             <label className="text-sm">
-              <span className="mb-1 block font-medium text-slate-700">Email</span>
+              <span className="mb-1 block font-medium text-slate-700">{t('auth.email')}</span>
               <input
                 type="email"
                 className="input"
                 value={chatProfile.email}
                 onChange={(e) => setChatProfile((p) => ({ ...p, email: e.target.value }))}
-                placeholder="vous@exemple.fr"
+                placeholder={t('contact.yourEmailPlaceholder')}
               />
             </label>
           </div>
@@ -225,18 +216,18 @@ export default function ContactPage() {
                     line.role === 'user' ? 'ml-auto bg-ocean text-white' : 'bg-white text-slate-800 shadow-sm'
                   }`}
                 >
-                  <p>{line.text}</p>
+                  <p>{line.role === 'bot' ? stripChatMarkdown(line.text) : line.text}</p>
                   {line.escalated ? (
                     <div className="mt-2 text-xs">
                       <p>{t('contact.human')}</p>
                       <Link to="/outils#support-form" className="mt-1 inline-block font-medium underline">
-                        Ouvrir le formulaire détaillé
+                        {t('contact.openDetailedForm')}
                       </Link>
                     </div>
                   ) : null}
                 </div>
               ))}
-              {chatLoading ? <p className="text-xs text-slate-500">Le chatbot rédige une réponse...</p> : null}
+              {chatLoading ? <p className="text-xs text-slate-500">{t('contact.chatTyping')}</p> : null}
               <div ref={bottomRef} />
             </div>
           </div>
@@ -249,17 +240,15 @@ export default function ContactPage() {
               placeholder={t('contact.chatPlaceholder')}
             />
             <button type="submit" className="btn-primary shrink-0" disabled={chatLoading}>
-              Envoyer
+              {t('contact.send')}
             </button>
           </form>
 
           {chatEscalated ? (
             <form onSubmit={submitEscalation} className="mt-4 space-y-3 rounded-2xl border border-amber-200 bg-amber-50 p-4">
               <div>
-                <h3 className="font-semibold text-amber-900">Escalade vers un agent humain</h3>
-                <p className="mt-1 text-sm text-amber-800">
-                  Décrivez votre besoin. Cette demande sera enregistrée dans le backoffice avec l’historique du chat.
-                </p>
+                <h3 className="font-semibold text-amber-900">{t('contact.escalationTitle')}</h3>
+                <p className="mt-1 text-sm text-amber-800">{t('contact.escalationDescription')}</p>
               </div>
               {supportErr ? <p className="text-sm text-red-600">{supportErr}</p> : null}
               {supportMsg ? <p className="text-sm text-green-700">{supportMsg}</p> : null}
@@ -267,16 +256,16 @@ export default function ContactPage() {
                 className="input"
                 value={supportForm.subject}
                 onChange={(e) => setSupportForm((f) => ({ ...f, subject: e.target.value }))}
-                placeholder="Sujet de la demande"
+                placeholder={t('contact.supportSubjectPlaceholder')}
               />
               <textarea
                 className="input min-h-[110px]"
                 value={supportForm.message}
                 onChange={(e) => setSupportForm((f) => ({ ...f, message: e.target.value }))}
-                placeholder="Expliquez votre besoin en détail"
+                placeholder={t('contact.supportMessagePlaceholder')}
               />
               <button type="submit" className="btn-primary">
-                Transmettre au support
+                {t('contact.submitToSupport')}
               </button>
             </form>
           ) : null}

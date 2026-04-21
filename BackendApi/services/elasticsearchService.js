@@ -150,7 +150,135 @@ export class ElasticsearchService {
                   { wildcard: { 'name.keyword': { value: '*chaise*roulante*', case_insensitive: true } } },
                   { wildcard: { 'name.keyword': { value: '*chaise-roulante*', case_insensitive: true } } },
                   { wildcard: { 'name.keyword': { value: '*déambulateur*', case_insensitive: true } } },
-                  { wildcard: { 'name.keyword': { value: '*deambulateur*', case_insensitive: true } } }
+                  { wildcard: { 'name.keyword': { value: '*deambulateur*', case_insensitive: true } } },
+                  { wildcard: { 'name.keyword': { value: '*seringue*', case_insensitive: true } } },
+                  {
+                    bool: {
+                      must: [
+                        { wildcard: { 'name.keyword': { value: '*gants*', case_insensitive: true } } },
+                        { wildcard: { 'name.keyword': { value: '*nitrile*', case_insensitive: true } } },
+                        {
+                          bool: {
+                            should: [
+                              {
+                                bool: {
+                                  must: [
+                                    { wildcard: { 'name.keyword': { value: '*non*', case_insensitive: true } } },
+                                    { wildcard: { 'name.keyword': { value: '*poudre*', case_insensitive: true } } }
+                                  ]
+                                }
+                              },
+                              {
+                                bool: {
+                                  must: [
+                                    { wildcard: { 'name.keyword': { value: '*sans*', case_insensitive: true } } },
+                                    { wildcard: { 'name.keyword': { value: '*poudre*', case_insensitive: true } } }
+                                  ]
+                                }
+                              }
+                            ],
+                            minimum_should_match: 1
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    bool: {
+                      must: [
+                        {
+                          bool: {
+                            should: [
+                              { wildcard: { 'name.keyword': { value: '*gueridon*', case_insensitive: true } } },
+                              { wildcard: { 'name.keyword': { value: '*guerido*', case_insensitive: true } } }
+                            ],
+                            minimum_should_match: 1
+                          }
+                        },
+                        { wildcard: { 'name.keyword': { value: '*inox*', case_insensitive: true } } }
+                      ]
+                    }
+                  },
+                  {
+                    bool: {
+                      must: [
+                        { wildcard: { 'name.keyword': { value: '*table*', case_insensitive: true } } },
+                        { wildcard: { 'name.keyword': { value: '*examen*', case_insensitive: true } } },
+                        {
+                          bool: {
+                            should: [
+                              { wildcard: { 'name.keyword': { value: '*electrique*', case_insensitive: true } } },
+                              { wildcard: { 'name.keyword': { value: '*électrique*', case_insensitive: true } } },
+                              { wildcard: { 'name.keyword': { value: '*electronique*', case_insensitive: true } } },
+                              { wildcard: { 'name.keyword': { value: '*électronique*', case_insensitive: true } } }
+                            ],
+                            minimum_should_match: 1
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    bool: {
+                      must: [
+                        {
+                          bool: {
+                            should: [
+                              { wildcard: { 'name.keyword': { value: '*tensiometre*', case_insensitive: true } } },
+                              { wildcard: { 'name.keyword': { value: '*tensiomètre*', case_insensitive: true } } }
+                            ],
+                            minimum_should_match: 1
+                          }
+                        },
+                        {
+                          bool: {
+                            should: [
+                              { wildcard: { 'name.keyword': { value: '*bras*', case_insensitive: true } } },
+                              { wildcard: { 'name.keyword': { value: '*brassard*', case_insensitive: true } } }
+                            ],
+                            minimum_should_match: 1
+                          }
+                        },
+                        {
+                          bool: {
+                            should: [
+                              { wildcard: { 'name.keyword': { value: '*electrique*', case_insensitive: true } } },
+                              { wildcard: { 'name.keyword': { value: '*électrique*', case_insensitive: true } } },
+                              { wildcard: { 'name.keyword': { value: '*electronique*', case_insensitive: true } } },
+                              { wildcard: { 'name.keyword': { value: '*électronique*', case_insensitive: true } } }
+                            ],
+                            minimum_should_match: 1
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    bool: {
+                      must: [
+                        { wildcard: { 'name.keyword': { value: '*capteur*', case_insensitive: true } } },
+                        { wildcard: { 'name.keyword': { value: '*plan*', case_insensitive: true } } },
+                        {
+                          bool: {
+                            should: [
+                              { wildcard: { 'name.keyword': { value: '*radiolog*', case_insensitive: true } } },
+                              { wildcard: { 'name.keyword': { value: '*radiologie*', case_insensitive: true } } }
+                            ],
+                            minimum_should_match: 1
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    bool: {
+                      must: [
+                        { wildcard: { 'name.keyword': { value: '*autoclave*', case_insensitive: true } } },
+                        { wildcard: { 'name.keyword': { value: '*classe*', case_insensitive: true } } },
+                        { wildcard: { 'name.keyword': { value: '*classe*b*', case_insensitive: true } } }
+                      ]
+                    }
+                  }
                 ],
                 minimum_should_match: 1
               }

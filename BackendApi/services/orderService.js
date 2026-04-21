@@ -125,7 +125,7 @@ export class OrderService {
     const order = await this.orderRepository.create(orderData);
     console.log('✅ [ORDER SERVICE] Order created in repository, orderNumber:', order.orderNumber);
 
-    // Ajouter les items de la commande
+    // Ajouter les items de la commande et diminuer le stock en base
     if (metadata.cartItems && Array.isArray(metadata.cartItems)) {
       for (const item of metadata.cartItems) {
         const product = await this.productRepository.findById(item.productId);
@@ -151,6 +151,18 @@ export class OrderService {
             subtotal: lineSubtotal,
             total: lineTotal
           });
+          const qty = Math.max(0, parseInt(String(item.quantity), 10) || 0);
+          if (qty > 0) {
+            const ok = await this.productRepository.decrementStock(item.productId, qty);
+            if (!ok) {
+              console.warn(
+                '[ORDER SERVICE] Stock non déduit (stock insuffisant ou produit absent) pour',
+                item.productId,
+                'qty',
+                qty
+              );
+            }
+          }
         }
       }
     }
