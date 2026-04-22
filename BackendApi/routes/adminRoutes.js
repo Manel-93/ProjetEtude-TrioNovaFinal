@@ -673,6 +673,8 @@ router.put(
 router.get('/billing/orders/:id/invoice/pdf', authenticate, isAdmin, adminBillingController.downloadInvoicePdf);
 router.post('/billing/orders/:id/invoice/email', authenticate, isAdmin, adminBillingController.sendInvoiceEmail);
 router.post('/billing/orders/:id/credit-note', authenticate, isAdmin, adminBillingController.createCreditNote);
+router.post('/billing/orders/:id/credit-note/automatic', authenticate, isAdmin, adminBillingController.createAutomaticCreditNote);
+router.delete('/billing/orders/:id/invoice', authenticate, isAdmin, adminBillingController.deleteInvoice);
 
 export default router;
 

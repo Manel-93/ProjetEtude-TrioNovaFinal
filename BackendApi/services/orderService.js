@@ -167,9 +167,6 @@ export class OrderService {
       }
     }
 
-    // Générer automatiquement la facture
-    await this.invoiceService.createInvoiceFromOrder(order.id);
-
     // Mettre à jour le statut de la commande en "processing"
     await this.orderRepository.updateStatus(order.id, 'processing', null, 'Commande créée automatiquement après paiement réussi');
 
@@ -338,13 +335,20 @@ export class OrderService {
       throw new Error('Commande introuvable');
     }
 
+    // Générer la facture lorsqu'une commande est finalisée
+    if (status === 'completed' && order.status !== 'completed') {
+      await this.invoiceService.createInvoiceFromOrder(orderId);
+    }
+
     // Si la commande est annulée, créer un avoir pour la facture
     if (status === 'canceled' && order.status !== 'canceled') {
       const invoice = await this.invoiceService.getInvoiceByOrderId(orderId);
       if (invoice && invoice.status === 'issued') {
         await this.invoiceService.createCreditNote(invoice.id, {
-          reason: notes || 'Annulation de commande',
-          amount: invoice.total
+          reason: notes || 'Annulation d\'une commande',
+          amount: invoice.total,
+          triggerType: 'order_cancellation',
+          source: 'order.status_update'
         });
       }
     }

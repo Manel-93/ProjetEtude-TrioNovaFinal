@@ -90,6 +90,7 @@ export const initializeDatabases = async () => {
         role ENUM('USER', 'ADMIN') DEFAULT 'USER',
         is_email_confirmed BOOLEAN DEFAULT FALSE,
         is_active BOOLEAN DEFAULT TRUE,
+        credit_balance DECIMAL(10, 2) DEFAULT 0.00,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         INDEX idx_email (email),
@@ -117,6 +118,9 @@ export const initializeDatabases = async () => {
       }
       if (!existingColumns.includes('is_active')) {
         await mysqlPool.execute(`ALTER TABLE users ADD COLUMN is_active BOOLEAN DEFAULT TRUE`);
+      }
+      if (!existingColumns.includes('credit_balance')) {
+        await mysqlPool.execute(`ALTER TABLE users ADD COLUMN credit_balance DECIMAL(10, 2) DEFAULT 0.00`);
       }
     } catch (error) {
       console.warn('Migration warning:', error.message);
@@ -456,6 +460,29 @@ export const initializeDatabases = async () => {
         INDEX idx_user_id (user_id),
         INDEX idx_credit_note_number (credit_note_number),
         INDEX idx_status (status)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+
+    // Historique du solde client lié aux avoirs
+    await mysqlPool.execute(`
+      CREATE TABLE IF NOT EXISTS customer_credit_transactions (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        credit_note_id INT NULL,
+        invoice_id INT NULL,
+        order_id INT NULL,
+        amount DECIMAL(10, 2) NOT NULL,
+        reason VARCHAR(255) NOT NULL,
+        metadata JSON,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (credit_note_id) REFERENCES credit_notes(id) ON DELETE SET NULL,
+        FOREIGN KEY (invoice_id) REFERENCES invoices(id) ON DELETE SET NULL,
+        FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE SET NULL,
+        INDEX idx_user_id (user_id),
+        INDEX idx_credit_note_id (credit_note_id),
+        INDEX idx_invoice_id (invoice_id),
+        INDEX idx_order_id (order_id)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
 

@@ -38,6 +38,10 @@ export class InvoiceService {
       return existingInvoice;
     }
 
+    if (order.status !== 'completed') {
+      throw new Error('La facture ne peut être générée que pour une commande finalisée');
+    }
+
     // Créer la facture
     const invoice = await this.invoiceRepository.create({
       orderId: orderId,
@@ -278,12 +282,20 @@ export class InvoiceService {
       throw new Error('Facture introuvable');
     }
 
-    if (invoice.status !== 'issued') {
-      throw new Error('Seules les factures émises peuvent être annulées');
+    if (!['draft', 'issued', 'paid', 'canceled'].includes(invoice.status)) {
+      throw new Error('Statut de facture non compatible pour la génération d’un avoir');
     }
 
     const order = await this.orderRepository.findById(invoice.orderId);
     
+    const triggerType = creditNoteData.triggerType || 'manual';
+    if (triggerType !== 'manual') {
+      const existingForTrigger = await this.invoiceRepository.findCreditNoteByInvoiceAndTrigger(invoiceId, triggerType);
+      if (existingForTrigger) {
+        return existingForTrigger.id;
+      }
+    }
+
     const creditNoteId = await this.invoiceRepository.createCreditNote({
       invoiceId: invoiceId,
       orderId: invoice.orderId,
@@ -291,7 +303,11 @@ export class InvoiceService {
       amount: creditNoteData.amount || invoice.total,
       currency: invoice.currency,
       reason: creditNoteData.reason || 'Annulation de commande',
-      status: 'draft'
+      status: 'draft',
+      metadata: {
+        triggerType,
+        source: creditNoteData.source || 'backoffice'
+      }
     });
 
     // Générer le PDF de l'avoir
@@ -300,7 +316,125 @@ export class InvoiceService {
     // Mettre à jour le statut de la facture
     await this.invoiceRepository.updateStatus(invoiceId, 'canceled');
 
+    // Alimenter le solde client si l'avoir est émis et qu'un client est lié
+    if (invoice.userId) {
+      await this.userRepository.incrementCreditBalance(invoice.userId, creditNoteData.amount || invoice.total);
+      await this.invoiceRepository.createCustomerCreditTransaction({
+        userId: invoice.userId,
+        creditNoteId,
+        invoiceId: invoice.id,
+        orderId: invoice.orderId,
+        amount: creditNoteData.amount || invoice.total,
+        reason: creditNoteData.reason || 'Avoir automatique',
+        metadata: {
+          triggerType,
+          source: creditNoteData.source || 'backoffice'
+        }
+      });
+
+      try {
+        const user = await this.userRepository.findById(invoice.userId);
+        const creditNote = await this.invoiceRepository.findCreditNoteById(creditNoteId);
+        if (user?.email && creditNote?.pdfPath) {
+          await this.emailService.sendCreditNoteEmail(
+            user.email,
+            user.first_name || '',
+            creditNote.creditNoteNumber,
+            creditNote.amount,
+            creditNote.reason,
+            creditNote.pdfPath
+          );
+        }
+      } catch (mailErr) {
+        console.warn('⚠️ Could not send credit note email:', mailErr.message);
+      }
+    }
+
     return creditNoteId;
+  }
+
+  // Suppression logique d'une facture avec création d'avoir automatique
+  async deleteInvoiceWithAutoCreditNote(invoiceId, options = {}) {
+    const invoice = await this.invoiceRepository.findById(invoiceId);
+    if (!invoice) {
+      throw new Error('Facture introuvable');
+    }
+
+    const existingNotes = await this.invoiceRepository.findCreditNotesByInvoiceId(invoiceId);
+    let creditNoteId = existingNotes[0]?.id || null;
+
+    if (!creditNoteId) {
+      creditNoteId = await this.createCreditNote(invoiceId, {
+        reason: options.reason || 'Suppression de facture depuis le back-office',
+        amount: options.amount || invoice.total,
+        triggerType: 'billing_error',
+        source: 'backoffice.invoice_delete'
+      });
+    }
+
+    // Suppression logique: conserver l'enregistrement pour la traçabilité comptable
+    await this.invoiceRepository.updateStatus(invoiceId, 'canceled');
+
+    if (invoice.pdfPath && fs.existsSync(invoice.pdfPath)) {
+      try {
+        fs.unlinkSync(invoice.pdfPath);
+      } catch (err) {
+        console.warn('⚠️ Unable to delete invoice PDF:', err.message);
+      }
+    }
+
+    return {
+      invoiceId,
+      creditNoteId
+    };
+  }
+
+  async createAutomaticCreditNoteByOrder(orderId, triggerType, payload = {}) {
+    const allowed = ['order_cancellation', 'goods_return', 'billing_error'];
+    if (!allowed.includes(triggerType)) {
+      throw new Error('Type de déclencheur d’avoir invalide');
+    }
+
+    const invoice = await this.invoiceRepository.findByOrderId(orderId);
+    if (!invoice) {
+      throw new Error('Facture introuvable pour cette commande');
+    }
+
+    const reasonByTrigger = {
+      order_cancellation: 'Annulation d’une commande',
+      goods_return: 'Retour de marchandise',
+      billing_error: 'Erreur de facturation'
+    };
+
+    const amount = payload.amount != null ? Number(payload.amount) : Number(invoice.total);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      throw new Error('Montant d’avoir invalide');
+    }
+
+    return this.createCreditNote(invoice.id, {
+      reason: payload.reason || reasonByTrigger[triggerType],
+      amount,
+      triggerType,
+      source: payload.source || 'backoffice.automatic'
+    });
+  }
+
+  async getCreditNotePDF(creditNoteId, userId = null) {
+    const creditNote = await this.invoiceRepository.findCreditNoteById(creditNoteId);
+    if (!creditNote) {
+      throw new Error('Avoir introuvable');
+    }
+
+    if (userId && creditNote.userId && creditNote.userId !== userId) {
+      throw new Error('Accès non autorisé à cet avoir');
+    }
+
+    if (!creditNote.pdfPath || !fs.existsSync(creditNote.pdfPath)) {
+      await this.generateCreditNotePDF(creditNoteId);
+      const updated = await this.invoiceRepository.findCreditNoteById(creditNoteId);
+      return updated?.pdfPath;
+    }
+    return creditNote.pdfPath;
   }
 
   // Générer le PDF d'un avoir

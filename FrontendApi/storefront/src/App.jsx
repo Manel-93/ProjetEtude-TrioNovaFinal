@@ -18,6 +18,7 @@ import AccountAddressesPage from './pages/AccountAddressesPage';
 import AccountPaymentsPage from './pages/AccountPaymentsPage';
 import AccountOrdersPage from './pages/AccountOrdersPage';
 import AccountOrderDetailPage from './pages/AccountOrderDetailPage';
+import AccountCreditsPage from './pages/AccountCreditsPage';
 import ContactPage from './pages/ContactPage';
 import AuthHandoffPage from './pages/AuthHandoffPage';
 import UnitTestsPage from './pages/UnitTestsPage';
@@ -59,6 +60,7 @@ export default function App() {
           <Route path="paiements" element={<AccountPaymentsPage />} />
           <Route path="commandes" element={<AccountOrdersPage />} />
           <Route path="commandes/:id" element={<AccountOrderDetailPage />} />
+          <Route path="avoirs" element={<AccountCreditsPage />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

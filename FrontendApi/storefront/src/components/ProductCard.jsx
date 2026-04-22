@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { getPrimaryImageUrl, isInStock } from '../utils/product';
+import { getPrimaryImageUrl, isInStock, getProductStockValue } from '../utils/product';
 import { getDefaultMedicalImageUrl, placeholderUrl } from '../utils/catalogFallbackImages';
 import { getProductDisplayName } from '../utils/productLocale';
 
@@ -9,6 +9,8 @@ export default function ProductCard({ product, listMode = false }) {
   const title = getProductDisplayName(product, i18n?.language || 'fr');
   const img = getPrimaryImageUrl(product) || getDefaultMedicalImageUrl();
   const stockOk = isInStock(product);
+  const stockValue = getProductStockValue(product);
+  const outOfStock = stockValue != null && stockValue <= 0;
   const normalizedName = String(product?.name || '')
     .toLowerCase()
     .normalize('NFD')
@@ -51,7 +53,7 @@ export default function ProductCard({ product, listMode = false }) {
             }
           }}
         />
-        {!stockOk ? (
+        {outOfStock ? (
           <span className="absolute bottom-2 left-2 rounded-md bg-red-600/90 px-2 py-0.5 text-[10px] font-semibold text-white">
             {t('product.outOfStock')}
           </span>
@@ -60,8 +62,8 @@ export default function ProductCard({ product, listMode = false }) {
       <div className="min-w-0 flex-1">
         <h3 className="line-clamp-2 font-semibold text-ink">{title}</h3>
         <p className="mt-1 text-lg font-bold text-ocean">{t('product.price', { value: price })}</p>
-        <p className="mt-1 text-xs text-slate-500">
-          {stockOk ? t('product.stock') : t('product.outOfStock')}
+        <p className={`mt-1 text-xs ${outOfStock ? 'font-semibold text-red-600' : 'text-slate-500'}`}>
+          {outOfStock ? t('product.outOfStock') : t('product.stock')}
         </p>
       </div>
     </>

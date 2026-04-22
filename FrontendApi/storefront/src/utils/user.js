@@ -7,6 +7,7 @@ export function normalizeUser(raw) {
     firstName: raw.first_name ?? raw.firstName,
     lastName: raw.last_name ?? raw.lastName,
     phone: raw.phone ?? null,
+    creditBalance: Number(raw.credit_balance ?? raw.creditBalance ?? 0),
     role,
     isEmailConfirmed: raw.is_email_confirmed ?? raw.isEmailConfirmed,
     isActive: raw.is_active ?? raw.isActive

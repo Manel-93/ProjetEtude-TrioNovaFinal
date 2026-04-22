@@ -3,8 +3,10 @@ import { LoginHistoryRepository } from '../repositories/loginHistoryRepository.j
 import { AddressRepository } from '../repositories/addressRepository.js';
 import { PaymentMethodRepository } from '../repositories/paymentMethodRepository.js';
 import { TokenRepository } from '../repositories/tokenRepository.js';
+import { InvoiceRepository } from '../repositories/invoiceRepository.js';
 import { PasswordService } from './passwordService.js';
 import { EmailService } from './emailService.js';
+import { InvoiceService } from './invoiceService.js';
 import { getMySQLConnection } from '../config/database.js';
 
 export class UserService {
@@ -14,8 +16,10 @@ export class UserService {
     this.addressRepository = new AddressRepository();
     this.paymentMethodRepository = new PaymentMethodRepository();
     this.tokenRepository = new TokenRepository();
+    this.invoiceRepository = new InvoiceRepository();
     this.passwordService = new PasswordService();
     this.emailService = new EmailService();
+    this.invoiceService = new InvoiceService();
   }
 
   // Masquer les données sensibles
@@ -46,6 +50,28 @@ export class UserService {
       addresses,
       paymentMethods
     };
+  }
+
+  async getMyCreditNotes(userId, pagination = {}) {
+    const { page = 1, limit = 20 } = pagination;
+    const safeLimit = Math.max(1, Math.min(100, parseInt(limit, 10) || 20));
+    const safePage = Math.max(1, parseInt(page, 10) || 1);
+    const offset = (safePage - 1) * safeLimit;
+    const data = await this.invoiceRepository.findCreditNotesByUserId(userId, safeLimit, offset);
+    const total = await this.invoiceRepository.countCreditNotesByUserId(userId);
+    return {
+      data,
+      pagination: {
+        page: safePage,
+        limit: safeLimit,
+        total,
+        totalPages: Math.max(1, Math.ceil(total / safeLimit))
+      }
+    };
+  }
+
+  async getMyCreditNotePDF(userId, creditNoteId) {
+    return this.invoiceService.getCreditNotePDF(creditNoteId, userId);
   }
 
   async updateMyProfile(userId, updateData) {

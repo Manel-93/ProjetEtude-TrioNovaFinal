@@ -1,3 +1,4 @@
+import fs from 'fs';
 import { UserService } from '../services/userService.js';
 
 export class UserController {
@@ -13,6 +14,40 @@ export class UserController {
         success: true,
         data: profile
       });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getMyCreditNotes = async (req, res, next) => {
+    try {
+      const userId = req.user.userId;
+      const { page = 1, limit = 20 } = req.query;
+      const result = await this.userService.getMyCreditNotes(userId, { page, limit });
+      res.status(200).json({
+        success: true,
+        data: result.data,
+        pagination: result.pagination
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getMyCreditNotePDF = async (req, res, next) => {
+    try {
+      const userId = req.user.userId;
+      const creditNoteId = parseInt(req.params.id, 10);
+      const pdfPath = await this.userService.getMyCreditNotePDF(userId, creditNoteId);
+      if (!pdfPath) {
+        return res.status(404).json({
+          success: false,
+          error: { message: 'PDF d\'avoir introuvable' }
+        });
+      }
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `inline; filename="avoir_${creditNoteId}.pdf"`);
+      fs.createReadStream(pdfPath).pipe(res);
     } catch (error) {
       next(error);
     }

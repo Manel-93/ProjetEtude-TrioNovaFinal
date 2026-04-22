@@ -45,6 +45,10 @@ export default function AccountProfilePage() {
   return (
     <div>
       <h1 className="text-2xl font-bold text-slate-900">{t('account.profile')}</h1>
+      <div className="card mt-4 max-w-lg p-4">
+        <p className="text-sm text-slate-600">Solde d&apos;avoir disponible</p>
+        <p className="text-xl font-bold text-ocean">{Number(user?.creditBalance || 0).toFixed(2)} EUR</p>
+      </div>
       <form onSubmit={submit} className="card mt-4 max-w-lg space-y-4 p-6">
         {err ? <p className="text-sm text-red-600">{err}</p> : null}
         {msg ? <p className="text-sm text-green-700">{msg}</p> : null}

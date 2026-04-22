@@ -94,6 +94,31 @@ export class InvoiceRepository {
     return rows.length > 0 ? this.mapRowToObject(rows[0]) : null;
   }
 
+  // Récupérer les avoirs d'une facture
+  async findCreditNotesByInvoiceId(invoiceId) {
+    const pool = await getMySQLConnection();
+    const [rows] = await pool.execute(
+      'SELECT * FROM credit_notes WHERE invoice_id = ? ORDER BY created_at DESC',
+      [invoiceId]
+    );
+    return rows.map((row) => ({
+      id: row.id,
+      creditNoteNumber: row.credit_note_number,
+      invoiceId: row.invoice_id,
+      orderId: row.order_id,
+      userId: row.user_id,
+      amount: parseFloat(row.amount),
+      currency: row.currency,
+      reason: row.reason,
+      status: row.status,
+      issuedAt: row.issued_at,
+      pdfPath: row.pdf_path,
+      metadata: row.metadata ? (typeof row.metadata === 'string' ? JSON.parse(row.metadata) : row.metadata) : null,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at
+    }));
+  }
+
   // Trouver les factures d'un utilisateur
   async findByUserId(userId, limit = 50, offset = 0) {
     const pool = await getMySQLConnection();
@@ -190,6 +215,95 @@ export class InvoiceRepository {
       createdAt: rows[0].created_at,
       updatedAt: rows[0].updated_at
     } : null;
+  }
+
+  async findCreditNotesByUserId(userId, limit = 50, offset = 0) {
+    const pool = await getMySQLConnection();
+    const [rows] = await pool.execute(
+      `SELECT cn.*, i.invoice_number, o.order_number
+       FROM credit_notes cn
+       LEFT JOIN invoices i ON i.id = cn.invoice_id
+       LEFT JOIN orders o ON o.id = cn.order_id
+       WHERE cn.user_id = ?
+       ORDER BY cn.created_at DESC
+       LIMIT ? OFFSET ?`,
+      [userId, limit, offset]
+    );
+    return rows.map((row) => ({
+      id: row.id,
+      creditNoteNumber: row.credit_note_number,
+      invoiceId: row.invoice_id,
+      invoiceNumber: row.invoice_number || null,
+      orderId: row.order_id,
+      orderNumber: row.order_number || null,
+      userId: row.user_id,
+      amount: parseFloat(row.amount),
+      currency: row.currency,
+      reason: row.reason,
+      status: row.status,
+      issuedAt: row.issued_at,
+      pdfPath: row.pdf_path,
+      metadata: row.metadata ? (typeof row.metadata === 'string' ? JSON.parse(row.metadata) : row.metadata) : null,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at
+    }));
+  }
+
+  async countCreditNotesByUserId(userId) {
+    const pool = await getMySQLConnection();
+    const [rows] = await pool.execute(
+      'SELECT COUNT(*) AS total FROM credit_notes WHERE user_id = ?',
+      [userId]
+    );
+    return Number(rows[0]?.total || 0);
+  }
+
+  async findCreditNoteByInvoiceAndTrigger(invoiceId, triggerType) {
+    const pool = await getMySQLConnection();
+    const [rows] = await pool.execute(
+      `SELECT * FROM credit_notes
+       WHERE invoice_id = ?
+       AND JSON_UNQUOTE(JSON_EXTRACT(metadata, '$.triggerType')) = ?
+       ORDER BY created_at DESC
+       LIMIT 1`,
+      [invoiceId, triggerType]
+    );
+    if (!rows.length) return null;
+    return {
+      id: rows[0].id,
+      creditNoteNumber: rows[0].credit_note_number,
+      invoiceId: rows[0].invoice_id,
+      orderId: rows[0].order_id,
+      userId: rows[0].user_id,
+      amount: parseFloat(rows[0].amount),
+      currency: rows[0].currency,
+      reason: rows[0].reason,
+      status: rows[0].status,
+      issuedAt: rows[0].issued_at,
+      pdfPath: rows[0].pdf_path,
+      metadata: rows[0].metadata ? (typeof rows[0].metadata === 'string' ? JSON.parse(rows[0].metadata) : rows[0].metadata) : null,
+      createdAt: rows[0].created_at,
+      updatedAt: rows[0].updated_at
+    };
+  }
+
+  async createCustomerCreditTransaction(transactionData) {
+    const pool = await getMySQLConnection();
+    const [result] = await pool.execute(
+      `INSERT INTO customer_credit_transactions (
+        user_id, credit_note_id, invoice_id, order_id, amount, reason, metadata
+      ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [
+        transactionData.userId,
+        transactionData.creditNoteId || null,
+        transactionData.invoiceId || null,
+        transactionData.orderId || null,
+        transactionData.amount,
+        transactionData.reason,
+        transactionData.metadata ? JSON.stringify(transactionData.metadata) : null
+      ]
+    );
+    return result.insertId;
   }
 }
 

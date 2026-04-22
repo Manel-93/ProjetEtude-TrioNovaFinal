@@ -58,6 +58,8 @@ const adminController = new AdminController();
  *         description: Non authentifié
  */
 router.get('/me', authenticate, userController.getMyProfile);
+router.get('/me/credits', authenticate, userController.getMyCreditNotes);
+router.get('/me/credits/:id/pdf', authenticate, userController.getMyCreditNotePDF);
 
 /**
  * @swagger

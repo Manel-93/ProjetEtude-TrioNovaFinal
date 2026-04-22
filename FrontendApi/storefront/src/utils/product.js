@@ -4,8 +4,6 @@ import {
   getMedicalProductDirectImageUrl
 } from './catalogFallbackImages';
 
-const FORCE_OUT_OF_STOCK_TERMS = ['boite de gants nitrile'];
-
 function normalizeName(value) {
   return String(value || '')
     .toLowerCase()
@@ -40,10 +38,7 @@ export function buildProductGalleryImages(product) {
   return [];
 }
 
-export function isInStock(product) {
-  const normalized = normalizeName(product?.name);
-  if (FORCE_OUT_OF_STOCK_TERMS.some((term) => normalized.includes(term))) return false;
-
+export function getProductStockValue(product) {
   const rawCandidates = [
     product?.stock,
     product?.stockQuantity,
@@ -54,8 +49,13 @@ export function isInStock(product) {
   const parsed = rawCandidates
     .map((v) => Number(v))
     .filter((v) => Number.isFinite(v));
-  if (!parsed.length) return false;
+  if (!parsed.length) return null;
 
-  // If one source reports 0 stock, we consider the product out of stock.
-  return Math.min(...parsed) > 0;
+  return Math.min(...parsed);
+}
+
+export function isInStock(product) {
+  const stock = getProductStockValue(product);
+  if (stock == null) return true;
+  return stock > 0;
 }

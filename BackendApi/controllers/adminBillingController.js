@@ -84,4 +84,54 @@ export class AdminBillingController {
       next(error);
     }
   };
+
+  createAutomaticCreditNote = async (req, res, next) => {
+    try {
+      const orderId = parseInt(req.params.id, 10);
+      const { triggerType, reason, amount } = req.body || {};
+      const order = await this.orderRepository.findById(orderId);
+      if (!order) {
+        return res.status(404).json({ success: false, error: { message: 'Commande introuvable' } });
+      }
+      const creditNoteId = await this.invoiceService.createAutomaticCreditNoteByOrder(orderId, triggerType, {
+        reason,
+        amount,
+        source: 'backoffice.automatic'
+      });
+      res.status(200).json({
+        success: true,
+        data: { creditNoteId, triggerType },
+        message: 'Avoir automatique généré avec succès'
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  deleteInvoice = async (req, res, next) => {
+    try {
+      const orderId = parseInt(req.params.id, 10);
+      const { reason } = req.body || {};
+      const order = await this.orderRepository.findById(orderId);
+      if (!order) {
+        return res.status(404).json({ success: false, error: { message: 'Commande introuvable' } });
+      }
+      const invoice = await this.invoiceRepository.findByOrderId(orderId);
+      if (!invoice) {
+        return res.status(404).json({ success: false, error: { message: 'Facture introuvable pour cette commande' } });
+      }
+
+      const result = await this.invoiceService.deleteInvoiceWithAutoCreditNote(invoice.id, {
+        reason: reason || 'Suppression de facture depuis le back-office'
+      });
+
+      res.status(200).json({
+        success: true,
+        data: result,
+        message: 'Facture supprimée et avoir généré automatiquement'
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 }

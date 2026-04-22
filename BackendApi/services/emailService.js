@@ -117,6 +117,40 @@ export class EmailService {
     }
   }
 
+  async sendCreditNoteEmail(email, firstName, creditNoteNumber, amount, reason, pdfPath) {
+    const safeName = firstName || 'Client';
+    const safeAmount = Number(amount || 0).toFixed(2);
+    const mailOptions = {
+      from: emailFrom,
+      to: email,
+      subject: `Votre avoir ${creditNoteNumber} - TrioNova`,
+      html: `
+        <h2>Votre avoir est disponible</h2>
+        <p>Bonjour ${safeName},</p>
+        <p>Un avoir a été émis sur votre compte.</p>
+        <p><strong>Référence :</strong> ${creditNoteNumber}</p>
+        <p><strong>Montant :</strong> ${safeAmount} EUR</p>
+        <p><strong>Motif :</strong> ${reason || 'Ajustement comptable'}</p>
+        <p>Le document PDF de l'avoir est joint à cet email.</p>
+        <p>Cordialement,<br>L'équipe TrioNova</p>
+      `,
+      attachments: [
+        {
+          filename: `avoir_${creditNoteNumber}.pdf`,
+          path: pdfPath
+        }
+      ]
+    };
+
+    try {
+      await emailTransporter.sendMail(mailOptions);
+      return true;
+    } catch (error) {
+      console.error('Erreur envoi email avoir:', error);
+      throw new Error('Erreur lors de l\'envoi de l\'email d\'avoir');
+    }
+  }
+
   async sendOrderConfirmation(email, firstName, orderNumber, total) {
     const mailOptions = {
       from: emailFrom,

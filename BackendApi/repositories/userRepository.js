@@ -13,7 +13,7 @@ export class UserRepository {
   async findById(id) {
     const pool = await getMySQLConnection();
     const [rows] = await pool.execute(
-      'SELECT id, email, first_name, last_name, phone, role, is_email_confirmed, is_active, created_at, updated_at FROM users WHERE id = ?',
+      'SELECT id, email, first_name, last_name, phone, role, is_email_confirmed, is_active, credit_balance, created_at, updated_at FROM users WHERE id = ?',
       [id]
     );
     return rows[0] || null;
@@ -24,7 +24,7 @@ export class UserRepository {
     const { page = 1, limit = 10 } = pagination;
     const offset = (page - 1) * limit;
     
-    let query = 'SELECT id, email, first_name, last_name, phone, role, is_email_confirmed, is_active, created_at, updated_at FROM users WHERE 1=1';
+    let query = 'SELECT id, email, first_name, last_name, phone, role, is_email_confirmed, is_active, credit_balance, created_at, updated_at FROM users WHERE 1=1';
     const params = [];
     
     if (filters.role) {
@@ -153,6 +153,15 @@ export class UserRepository {
     const pool = await getMySQLConnection();
     await pool.execute('DELETE FROM users WHERE id = ?', [userId]);
     return true;
+  }
+
+  async incrementCreditBalance(userId, amount) {
+    const pool = await getMySQLConnection();
+    await pool.execute(
+      'UPDATE users SET credit_balance = COALESCE(credit_balance, 0) + ? WHERE id = ?',
+      [amount, userId]
+    );
+    return this.findById(userId);
   }
 }
 

@@ -23,6 +23,9 @@ export default function AccountLayout() {
           <NavLink to="/compte/commandes" className={link}>
             {t('account.orders')}
           </NavLink>
+          <NavLink to="/compte/avoirs" className={link}>
+            Avoirs
+          </NavLink>
         </nav>
       </aside>
       <div className="min-w-0 flex-1">

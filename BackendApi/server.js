@@ -27,6 +27,14 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const isDevelopment = String(process.env.NODE_ENV || '').toLowerCase() === 'development';
+const trustProxy = process.env.TRUST_PROXY;
+
+if (trustProxy === 'true') {
+  app.set('trust proxy', 1);
+} else if (trustProxy === 'false') {
+  app.set('trust proxy', false);
+}
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const uploadsDir = path.join(__dirname, 'uploads');
@@ -70,9 +78,12 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // Rate Limiting - Protection contre les attaques par force brute
+const apiRateLimitWindowMs = Number(process.env.RATE_LIMIT_WINDOW_MS || 15 * 60 * 1000);
+const apiRateLimitMax = Number(process.env.RATE_LIMIT_MAX || (isDevelopment ? 1000 : 100));
+
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // 100 requêtes par fenêtre
+  windowMs: apiRateLimitWindowMs,
+  max: apiRateLimitMax,
   message: {
     success: false,
     error: {
@@ -81,7 +92,12 @@ const limiter = rateLimit({
     }
   },
   standardHeaders: true, // Retourne les headers RateLimit-* dans la réponse
-  legacyHeaders: false
+  legacyHeaders: false,
+  skip: (req) => {
+    if (!isDevelopment) return false;
+    const ip = String(req.ip || '');
+    return ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1';
+  }
 });
 
 // Rate limiting plus strict pour l'authentification

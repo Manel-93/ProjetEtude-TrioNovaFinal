@@ -7,6 +7,22 @@ import { fetchProducts, fetchProductBySlug } from '../services/products';
 import ProductCard from '../components/ProductCard';
 import { getCategoryDisplayName } from '../utils/categoryLocale';
 
+function normalizeProductName(name) {
+  return String(name || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '');
+}
+
+function isHiddenCatalogProduct(product) {
+  const n = normalizeProductName(product?.name);
+  if (!n) return false;
+  if ((n.includes('gants') || n.includes('gant')) && n.includes('nitrile') && n.includes('poudr')) return true;
+  if ((n.includes('gueridon') || n.includes('guerido')) && n.includes('inox')) return true;
+  if (n.includes('otoscope') && n.includes('fibre') && n.includes('optique')) return true;
+  return false;
+}
+
 export default function SearchPage() {
   const { t, i18n } = useTranslation();
   const lang = i18n?.language || 'fr';
@@ -34,7 +50,7 @@ export default function SearchPage() {
     [q, categoryId, minPrice, maxPrice, inStock, sortBy, page]
   );
 
-  const { data, isLoading, error, isFetching } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['search', queryPayload],
     queryFn: () => searchProducts(queryPayload),
     placeholderData: (prev) => prev
@@ -64,7 +80,7 @@ export default function SearchPage() {
     }
   });
 
-  const items = data?.data || [];
+  const items = (data?.data || []).filter((p) => !isHiddenCatalogProduct(p));
   const pagination = data?.pagination;
 
   const setField = (key, value) => {
@@ -160,10 +176,6 @@ export default function SearchPage() {
         <p className="text-red-600">{t('common.error')}</p>
       ) : (
         <>
-          <p className="text-sm text-slate-600">
-            {t('search.results', { count: pagination?.total ?? items.length })}
-            {isFetching ? ` (${t('common.loading')})` : ''}
-          </p>
           {items.length === 0 ? (
             <p className="text-slate-500">{t('search.noResults')}</p>
           ) : (
@@ -207,10 +219,6 @@ export default function SearchPage() {
           ) : null}
         </>
       )}
-
-      <p className="text-xs text-slate-400">
-        {data?.source === 'mysql' ? 'Recherche via le catalogue (Elasticsearch indisponible).' : null}
-      </p>
     </div>
   );
 }

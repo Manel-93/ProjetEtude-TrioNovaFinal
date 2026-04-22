@@ -22,3 +22,8 @@ export const deletePaymentMethod = (id) => api.delete(`/users/me/payment-methods
 
 export const setDefaultPaymentMethod = (id) =>
   api.patch(`/users/me/payment-methods/${id}/default`);
+
+export const getMyCredits = (params = {}) => api.get('/users/me/credits', { params });
+
+export const downloadMyCreditPdf = (id) =>
+  api.get(`/users/me/credits/${id}/pdf`, { responseType: 'blob' });

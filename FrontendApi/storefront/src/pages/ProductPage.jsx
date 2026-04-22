@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchProducts, fetchProductBySlug } from '../services/products';
 import { addToCart } from '../services/cart';
 import { getApiError } from '../utils/errors';
-import { isInStock, buildProductGalleryImages, getPrimaryImageUrl } from '../utils/product';
+import { isInStock, buildProductGalleryImages, getPrimaryImageUrl, getProductStockValue } from '../utils/product';
 import ProductCard from '../components/ProductCard';
 import { resolveMediaUrl } from '../utils/mediaUrl';
 import { getProductDisplayDescription, getProductDisplayName } from '../utils/productLocale';
@@ -62,6 +62,8 @@ export default function ProductPage() {
   const main = images[imgIdx] || images[0];
   const mainUrl = main?.url ? resolveMediaUrl(main.url) : getPrimaryImageUrl(data);
   const stockOk = isInStock(data);
+  const stockValue = getProductStockValue(data);
+  const outOfStock = stockValue != null && stockValue <= 0;
   const specs = data.technicalSpecs && typeof data.technicalSpecs === 'object' ? data.technicalSpecs : null;
   const displayName = getProductDisplayName(data, i18n?.language || 'fr');
 
@@ -99,8 +101,8 @@ export default function ProductPage() {
           <p className="mt-4 text-3xl font-bold text-ocean">
             {t('product.price', { value: Number(data.priceTtc).toFixed(2) })}
           </p>
-          <p className="mt-2 text-sm font-medium text-slate-600">
-            {stockOk ? t('product.stock') : t('product.outOfStock')}
+          <p className={`mt-2 text-sm font-medium ${outOfStock ? 'text-red-600' : 'text-slate-600'}`}>
+            {outOfStock ? t('product.outOfStock') : t('product.stock')}
           </p>
           {data.category ? (
             <Link
